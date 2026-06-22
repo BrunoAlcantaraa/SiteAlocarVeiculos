@@ -7,21 +7,21 @@ let carros = [
         nome: "Corolla",
         marca: "Toyota",
         placa: "ABC-1234",
-        img: "resources/carros/corolla.png",
+        img: "resources/veiculos/corolla.png",
         cliente: null
     },
     {
         nome: "Civic",
         marca: "Honda",
         placa: "DEF-5678",
-        img: "resources/carros/civic.png",
+        img: "resources/veiculos/civic.png",
         cliente: null
     },
     {
         nome: "Duster",
         marca: "Renault",
         placa: "GHI-9012",
-        img: "resources/carros/duster.png",
+        img: "resources/veiculos/duster.png",
         cliente: null
     }
 ];
