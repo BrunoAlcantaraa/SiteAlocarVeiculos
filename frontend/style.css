@@ -1,0 +1,85 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+#container-carros {
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    gap: 120px;
+    padding: 20px;
+}
+
+.card-carro {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    width: 400px;
+    height: 150px;
+    display: block;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-carro img {
+    max-width: 100%;
+    max-height: 120px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 10px;
+}
+
+.card-carro button {
+    display: block;
+    width: 100%;
+    background-color: #3c4d5f;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-conteudo {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    padding: 24px;
+    border-radius: 12px;
+    width: 300px;
+}
+
+#alocar-fechar {
+    display: flex;
+    margin: 12px 0;
+    gap: 12px;
+    justify-content: center;
+    align-items: center;
+}
+
+#alocar-fechar button {
+    background-color: #3c4d5f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+}

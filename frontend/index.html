@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alocação de Carros</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1>Carros Disponíveis</h1>
+
+    <div id="container-carros" section="carros"></div>
+
+    <div id="container-alocar" section="alocar">
+        <h2>Para quem deseja alocar?</h2>
+        
+    </div>
+
+    <div id="modal-cliente" class="modal">
+        <div class="modal-conteudo">
+            <h2>Escolha o cliente</h2>
+
+            <select id="checkbox-cliente-alocar"></select>
+
+            <div id="alocar-fechar">
+                <button id="btn-alocar" onclick="alocarCarro()">Alocar</button>
+                <button onclick="fecharModal()">Cancelar</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
