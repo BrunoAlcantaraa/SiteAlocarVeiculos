@@ -1,3 +1,10 @@
+// Paginas
+const pagCarros = document.getElementById("pag-carros-disponiveis");
+const pagCadastroCarros = document.getElementById("pag-cadastro-carros");
+const pagCadastroClientes = document.getElementById("pag-cadastro-clientes");
+
+
+// Pagina Carros Disponiveis
 const containerCarros = document.getElementById("container-carros");
 const containerAlocar = document.getElementById("container-alocar");
 const checkboxClienteAlocar = document.getElementById("checkbox-cliente-alocar");
@@ -44,11 +51,12 @@ function start() {
 }
 
 function render() {
+
     containerCarros.innerHTML = "";
 
     for (let i = 0; i < carros.length; i++) {
         if (carros[i].cliente == null) {
-            adicionarCarro(carros[i]);
+            adicionarCardCarro(carros[i]);
         }
     }
 
@@ -60,9 +68,18 @@ function render() {
         option.textContent = clientes[i].nome;
         checkboxClienteAlocar.appendChild(option);
     }
+
 }
 
-function adicionarCarro(carro) {
+function mostrarPagina(pagina) {
+    pagCarros.style.display = "none";
+    pagCadastroClientes.style.display = "none";
+    pagCadastroCarros.style.display = "none";
+    document.getElementById(pagina).style.display = "block";
+}
+
+
+function adicionarCardCarro(carro) {
     let card = document.createElement("div");
     card.classList.add("card-carro");
     card.innerHTML = `
