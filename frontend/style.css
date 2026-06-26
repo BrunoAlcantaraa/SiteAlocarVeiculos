@@ -13,10 +13,20 @@ body {
 #menu {
     background-color: #57708a;
     color: white;
-    padding: 10px 20px;
+    padding: 15px 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 30px;
+}
+
+#menu a {
+    color: white;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
 }
 
 #container-carros {
@@ -94,5 +104,34 @@ body {
 }
 
 .pag-cadastro {
-    
+    display: none;
+    padding: 20px;
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.pag-cadastro h1 {
+    margin-bottom: 20px;
+    color: #57708a;
+}
+
+.pag-cadastro input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.pag-cadastro button {
+    width: 100%;
+    background-color: #3c4d5f;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
 }
