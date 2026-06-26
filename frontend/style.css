@@ -351,10 +351,11 @@ body {
 
 .pag-cadastro {
     display: none;
-    max-width: 440px;
+    max-width: 480px;
 }
 
-.pag-cadastro input {
+.pag-cadastro input,
+.pag-cadastro select {
     display: block;
     width: 100%;
     padding: 10px 12px;
@@ -364,9 +365,11 @@ body {
     font-size: 14px;
     font-family: Arial, sans-serif;
     background: #fff;
+    color: #333;
 }
 
-.pag-cadastro input:focus {
+.pag-cadastro input:focus,
+.pag-cadastro select:focus {
     outline: none;
     border-color: #57708a;
     box-shadow: 0 0 0 2px rgba(87, 112, 138, 0.15);
@@ -385,4 +388,31 @@ body {
 
 .pag-cadastro button:hover {
     background-color: #2c3a4a;
+}
+
+.form-section {
+    margin-bottom: 24px;
+}
+
+.form-section h4 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a8fa6;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e4e7eb;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.form-row input,
+.form-row select {
+    margin-bottom: 0;
 }

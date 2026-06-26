@@ -174,24 +174,64 @@ function alocarCarro() {
 // ==================== CADASTRO ====================
 
 function cadastrarCarro() {
-    const marca  = document.getElementById("input-marca-carro").value.trim();
-    const modelo = document.getElementById("input-modelo-carro").value.trim();
-    if (!marca || !modelo) return;
+    const marca       = document.getElementById("input-marca-carro").value.trim();
+    const modelo      = document.getElementById("input-modelo-carro").value.trim();
+    const ano         = document.getElementById("input-ano-carro").value.trim();
+    const placa       = document.getElementById("input-placa-carro").value.trim();
+    const renavam     = document.getElementById("input-renavam-carro").value.trim();
+    const cor         = document.getElementById("input-cor-carro").value.trim();
+    const km          = document.getElementById("input-km-carro").value.trim();
+    const combustivel = document.getElementById("input-combustivel-carro").value;
+    const valorDiario = document.getElementById("input-valor-diario-carro").value.trim();
+    const status      = document.getElementById("input-status-carro").value;
+    const imagem      = document.getElementById("input-imagem-carro").value.trim();
 
-    carros.push({ nome: modelo, marca, placa: "", img: "", cliente: null });
-    document.getElementById("input-marca-carro").value  = "";
-    document.getElementById("input-modelo-carro").value = "";
+    if (!marca || !modelo || !placa || !renavam) return;
+
+    carros.push({
+        nome: modelo, marca, ano, placa, renavam, cor,
+        kms_atual: km, combustivel, valor_diario: valorDiario,
+        status, img: imagem, cliente: null
+    });
+
+    [
+        "input-marca-carro", "input-modelo-carro", "input-ano-carro", "input-placa-carro",
+        "input-renavam-carro", "input-cor-carro", "input-km-carro", "input-combustivel-carro",
+        "input-valor-diario-carro", "input-status-carro", "input-imagem-carro"
+    ].forEach(id => { document.getElementById(id).value = ""; });
+
     render();
 }
 
 function cadastrarCliente() {
-    const nome = document.getElementById("input-nome-cliente").value.trim();
-    const cpf  = document.getElementById("input-cpf-cliente").value.trim();
+    const nome        = document.getElementById("input-nome-cliente").value.trim();
+    const cpf         = document.getElementById("input-cpf-cliente").value.trim();
+    const nascimento  = document.getElementById("input-nascimento-cliente").value;
+    const sexo        = document.getElementById("input-sexo-cliente").value;
+    const email       = document.getElementById("input-email-cliente").value.trim();
+    const telefone    = document.getElementById("input-telefone-cliente").value.trim();
+    const cep         = document.getElementById("input-cep-cliente").value.trim();
+    const estado      = document.getElementById("input-estado-cliente").value.trim();
+    const cidade      = document.getElementById("input-cidade-cliente").value.trim();
+    const bairro      = document.getElementById("input-bairro-cliente").value.trim();
+    const rua         = document.getElementById("input-rua-cliente").value.trim();
+    const numEnd      = document.getElementById("input-numero-end-cliente").value.trim();
+    const complemento = document.getElementById("input-complemento-cliente").value.trim();
+
     if (!nome || !cpf) return;
 
-    clientes.push({ nome, cpf });
-    document.getElementById("input-nome-cliente").value = "";
-    document.getElementById("input-cpf-cliente").value  = "";
+    clientes.push({
+        nome, cpf, nascimento, sexo, email, telefone,
+        endereco: { cep, estado, cidade, bairro, rua, numero: numEnd, complemento }
+    });
+
+    [
+        "input-nome-cliente", "input-cpf-cliente", "input-nascimento-cliente", "input-sexo-cliente",
+        "input-email-cliente", "input-telefone-cliente", "input-cep-cliente", "input-estado-cliente",
+        "input-cidade-cliente", "input-bairro-cliente", "input-rua-cliente",
+        "input-numero-end-cliente", "input-complemento-cliente"
+    ].forEach(id => { document.getElementById(id).value = ""; });
+
     renderOpcoesClientes();
     renderDashboard();
 }
