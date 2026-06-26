@@ -3,58 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alocação de Carros</title>
+    <title>Alugue Fácil</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Menu de Navegação -->
-    <nav id="menu">
-        <a href="#" onclick="mostrarPagina('pag-carros-disponiveis')">Carros Disponíveis</a>
-        <a href="#" onclick="mostrarPagina('pag-cadastro-carros')">Cadastro de Carros</a>
-        <a href="#" onclick="mostrarPagina('pag-cadastro-clientes')">Cadastro de Clientes</a>
-    </nav>
+    <div id="layout">
 
-    <!-- Conteúdo da Página de Carros Disponíveis -->
-    <div id="pag-carros-disponiveis">
-        <h1>Carros Disponíveis</h1>
+        <!-- Sidebar -->
+        <aside id="sidebar">
+            <div id="sidebar-logo">
+                <h2>Alugue Fácil</h2>
+                <span>Sistema de Alocação</span>
+            </div>
+            <nav id="sidebar-nav">
+                <a href="#" class="nav-item" data-page="pag-dashboard"
+                   onclick="mostrarPagina('pag-dashboard')">Dashboard</a>
+                <a href="#" class="nav-item" data-page="pag-alocacao"
+                   onclick="mostrarPagina('pag-alocacao')">Alocação</a>
+                <a href="#" class="nav-item" data-page="pag-cadastro-carros"
+                   onclick="mostrarPagina('pag-cadastro-carros')">Veículos</a>
+                <a href="#" class="nav-item" data-page="pag-cadastro-clientes"
+                   onclick="mostrarPagina('pag-cadastro-clientes')">Clientes</a>
+            </nav>
+        </aside>
 
-        <div id="container-carros" section="carros"></div>
+        <!-- Área Principal -->
+        <div id="main">
 
-        <div id="container-alocar" section="alocar"></div>
+            <!-- Barra de Ações -->
+            <div id="action-bar">
+                <h2 id="action-bar-title"></h2>
+                <div id="action-bar-actions"></div>
+            </div>
 
-        <div id="modal-cliente" class="modal">
-            <div class="modal-conteudo">
-                <h2>Escolha o cliente</h2>
+            <!-- Conteúdo -->
+            <div id="content">
 
-                <select id="checkbox-cliente-alocar"></select>
+                <!-- Dashboard -->
+                <div id="pag-dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Total de Veículos</div>
+                            <div class="stat-value" id="stat-total-carros">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Disponíveis</div>
+                            <div class="stat-value" id="stat-carros-disponiveis">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Alocados</div>
+                            <div class="stat-value" id="stat-carros-alocados">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Total de Clientes</div>
+                            <div class="stat-value" id="stat-total-clientes">0</div>
+                        </div>
+                    </div>
 
-                <div id="alocar-fechar">
-                    <button id="btn-alocar" onclick="alocarCarro()">Alocar</button>
-                    <button onclick="fecharModal()">Cancelar</button>
+                    <div id="secao-alocacoes">
+                        <h3>Veículos Alocados</h3>
+                        <div id="lista-alocacoes"></div>
+                    </div>
                 </div>
-                
+
+                <!-- Alocação -->
+                <div id="pag-alocacao">
+                    <div id="container-carros"></div>
+                    <p id="msg-sem-carros">Nenhum veículo disponível para alocação.</p>
+
+                    <div id="modal-cliente" class="modal">
+                        <div class="modal-conteudo">
+                            <h2>Selecionar Cliente</h2>
+                            <select id="checkbox-cliente-alocar"></select>
+                            <div id="alocar-fechar">
+                                <button onclick="fecharModal()">Cancelar</button>
+                                <button id="btn-alocar" onclick="alocarCarro()">Alocar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cadastro de Veículos -->
+                <div id="pag-cadastro-carros" class="pag-cadastro">
+                    <input type="text" id="input-marca-carro" placeholder="Marca do Veículo">
+                    <input type="text" id="input-modelo-carro" placeholder="Modelo do Veículo">
+                    <button onclick="cadastrarCarro()">Cadastrar Veículo</button>
+                </div>
+
+                <!-- Cadastro de Clientes -->
+                <div id="pag-cadastro-clientes" class="pag-cadastro">
+                    <input type="text" id="input-nome-cliente" placeholder="Nome do Cliente">
+                    <input type="text" id="input-cpf-cliente" placeholder="CPF do Cliente">
+                    <button onclick="cadastrarCliente()">Cadastrar Cliente</button>
+                </div>
+
             </div>
         </div>
-    </div>
-
-    <!-- Conteúdo da Página de Cadastro de Veículos -->
-    <div id="pag-cadastro-carros" class="pag-cadastro">
-        <h1>Cadastro de Carros</h1>
-
-        <input type="text" id="input-marca-carro" placeholder="Marca do Carro">
-        <input type="text" id="input-modelo-carro" placeholder="Modelo do Carro">
-        <button id="btn-cadastrar-carro" onclick="cadastrarCarro()">Cadastrar Carro</button>
-
-    </div>
-
-    <!-- Conteúdo da Página de Cadastro de Clientes -->
-    <div id="pag-cadastro-clientes" class="pag-cadastro">
-        <h1>Cadastro de Clientes</h1>
-
-        <input type="text" id="input-nome-cliente" placeholder="Nome do Cliente">
-        <input type="text" id="input-cpf-cliente" placeholder="CPF do Cliente">
-        <button id="btn-cadastrar-cliente" onclick="cadastrarCliente()">Cadastrar Cliente</button>
     </div>
 
     <script src="script.js"></script>
