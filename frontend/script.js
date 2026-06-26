@@ -1,16 +1,23 @@
-// Paginas
-const pagCarros = document.getElementById("pag-carros-disponiveis");
-const pagCadastroCarros = document.getElementById("pag-cadastro-carros");
-const pagCadastroClientes = document.getElementById("pag-cadastro-clientes");
+// ==================== DOM ELEMENTS ====================
 
+// Páginas
+const pages = {
+    carros: document.getElementById("pag-carros-disponiveis"),
+    cadastroCarros: document.getElementById("pag-cadastro-carros"),
+    cadastroClientes: document.getElementById("pag-cadastro-clientes")
+};
 
-// Pagina Carros Disponiveis
-const containerCarros = document.getElementById("container-carros");
-const containerAlocar = document.getElementById("container-alocar");
-const checkboxClienteAlocar = document.getElementById("checkbox-cliente-alocar");
+// Container - Carros Disponíveis
+const dom = {
+    containerCarros: document.getElementById("container-carros"),
+    containerAlocar: document.getElementById("container-alocar"),
+    modalCliente: document.getElementById("modal-cliente"),
+    selectCliente: document.getElementById("checkbox-cliente-alocar")
+};
 
+// ==================== DATA ====================
 let carros = [
-    {
+    {        
         nome: "Corolla",
         marca: "Toyota",
         placa: "ABC-1234",
@@ -34,53 +41,72 @@ let carros = [
 ];
 
 let clientes = [
-    {
-        nome: "Bruno Alcantara"
-    }, 
-    {
-        nome: "Ian Batista"
-    }
-]
+    { nome: "Bruno Alcantara" },
+    { nome: "Ian Batista" }
+];
 
 let indexCarroSelecionado = null;
 
-function start() {
+// ==================== INIT ====================
 
+function init() {
     render();
-
 }
 
+// ==================== RENDER ====================
+
+// Renderiza todos os carros disponíveis
 function render() {
-
-    containerCarros.innerHTML = "";
-
-    for (let i = 0; i < carros.length; i++) {
-        if (carros[i].cliente == null) {
-            adicionarCardCarro(carros[i]);
-        }
-    }
-
-    containerAlocar.innerHTML = "";
-
-    for (let i = 0; i < clientes.length; i++) {
-        let option = document.createElement("option");
-        option.value = i;
-        option.textContent = clientes[i].nome;
-        checkboxClienteAlocar.appendChild(option);
-    }
-
+    renderCardCarros();
+    renderOpcoesClientes();
 }
 
-function mostrarPagina(pagina) {
-    pagCarros.style.display = "none";
-    pagCadastroClientes.style.display = "none";
-    pagCadastroCarros.style.display = "none";
-    document.getElementById(pagina).style.display = "block";
+// Renderiza cards dos carros sem cliente
+function renderCardCarros() {
+    dom.containerCarros.innerHTML = "";
+    
+    carros
+        .filter(carro => carro.cliente === null)
+        .forEach(carro => adicionarCardCarro(carro));
 }
 
+// Renderiza lista de clientes no select
+function renderOpcoesClientes() {
+    dom.selectCliente.innerHTML = "";
+    
+    clientes.forEach((cliente, index) => {
+        const option = document.createElement("option");
+        option.value = index;
+        option.textContent = cliente.nome;
+        dom.selectCliente.appendChild(option);
+    });
+}
 
+// ==================== NAVEGAÇÃO ====================
+
+// Mostra a página solicitada e esconde as outras
+function mostrarPagina(paginaId) {
+    Object.values(pages).forEach(page => page.style.display = "none");
+    document.getElementById(paginaId).style.display = "block";
+}
+
+// ==================== MODAL ====================
+
+// Abre modal de seleção de cliente
+function abrirModalCliente() {
+    dom.modalCliente.style.display = "flex";
+}
+
+// Fecha modal
+function fecharModal() {
+    dom.modalCliente.style.display = "none";
+}
+
+// ==================== CARROS ====================
+
+// Cria e adiciona card de carro ao DOM
 function adicionarCardCarro(carro) {
-    let card = document.createElement("div");
+    const card = document.createElement("div");
     card.classList.add("card-carro");
     card.innerHTML = `
         <img src="${carro.img}" alt="${carro.nome}">
@@ -88,25 +114,27 @@ function adicionarCardCarro(carro) {
         <p>${carro.marca}</p>
         <button onclick="selecionarCarro(${carros.indexOf(carro)})">Selecionar</button>
     `;
-    containerCarros.appendChild(card);
+    dom.containerCarros.appendChild(card);
 }
 
+// Seleciona um carro e abre modal
 function selecionarCarro(index) {
     indexCarroSelecionado = index;
-    document.getElementById("modal-cliente").style.display = "flex";
+    abrirModalCliente();
 }
 
+// Aloca carro para cliente
 function alocarCarro() {
-    const clienteSelecionado = clientes[checkboxClienteAlocar.value];
-    carros[indexCarroSelecionado].cliente = clienteSelecionado;
-
-    alert(`Carro ${carros[indexCarroSelecionado].nome} alocado para ${clienteSelecionado.nome}`);
+    const clienteSelecionado = clientes[dom.selectCliente.value];
+    const carroSelecionado = carros[indexCarroSelecionado];
+    
+    carroSelecionado.cliente = clienteSelecionado;
+    alert(`Carro ${carroSelecionado.nome} alocado para ${clienteSelecionado.nome}`);
+    
     fecharModal();
     render();
 }
 
-function fecharModal() {
-    document.getElementById("modal-cliente").style.display = "none";
-}
+// ==================== START ====================
 
-start();
+init();
