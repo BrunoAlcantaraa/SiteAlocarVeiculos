@@ -1,33 +1,42 @@
-// ==================== DOM ELEMENTS ====================
+/*
+    DOM
+*/
 
 const pages = {
-    dashboard:        document.getElementById("pag-dashboard"),
-    alocacao:         document.getElementById("pag-alocacao"),
-    cadastroCarros:   document.getElementById("pag-cadastro-carros"),
-    cadastroClientes: document.getElementById("pag-cadastro-clientes")
+    "pag-dashboard":         document.getElementById("pag-dashboard"),
+    "pag-alocacao":          document.getElementById("pag-alocacao"),
+    "pag-cadastro-veiculos": document.getElementById("pag-cadastro-veiculos"),
+    "pag-cadastro-clientes": document.getElementById("pag-cadastro-clientes")
 };
 
 const dom = {
-    containerCarros:  document.getElementById("container-carros"),
-    msgSemCarros:     document.getElementById("msg-sem-carros"),
-    modalCliente:     document.getElementById("modal-cliente"),
-    selectCliente:    document.getElementById("checkbox-cliente-alocar"),
-    actionBarTitle:   document.getElementById("action-bar-title"),
-    actionBarActions: document.getElementById("action-bar-actions"),
-    tbodyCarros:      document.getElementById("tbody-carros"),
-    tabelaCarros:     document.getElementById("tabela-carros"),
-    formCarros:       document.getElementById("form-cadastrar-carro"),
-    tbodyClientes:      document.getElementById("tbody-clientes"),
-    tabelaClientes:     document.getElementById("tabela-clientes"),
-    formClientes:       document.getElementById("form-cadastrar-clientes")
+    containerVeiculos:   document.getElementById("container-veiculos"),
+    msgSemVeiculos:      document.getElementById("msg-sem-veiculos"),
+    modalCliente:        document.getElementById("modal-cliente"),
+    selectCliente:       document.getElementById("checkbox-cliente-alocar"),
+    actionBarTitle:      document.getElementById("action-bar-title"),
+    actionBarActions:    document.getElementById("action-bar-actions"),
+    tbodyVeiculos:       document.getElementById("tbody-veiculos"),
+    tabelaVeiculos:      document.getElementById("tabela-veiculos"),
+    formVeiculos:        document.getElementById("form-cadastrar-veiculo"),
+    tbodyClientes:       document.getElementById("tbody-clientes"),
+    tabelaClientes:      document.getElementById("tabela-clientes"),
+    formClientes:        document.getElementById("form-cadastrar-clientes"),
+    statTotalVeiculos:   document.getElementById("stat-total-veiculos"),
+    statDisponiveis:     document.getElementById("stat-veiculos-disponiveis"),
+    statAlocados:        document.getElementById("stat-veiculos-alocados"),
+    statTotalClientes:   document.getElementById("stat-total-clientes"),
+    listaAlocacoes:      document.getElementById("lista-alocacoes"),
 };
 
-// ==================== DATA ====================
+/*
+    DADOS
+*/
 
 let veiculos = [
-    { nome: "Corolla", renavam: "123456789123", marca: "Toyota",  placa: "ABC-1234", img: "resources/veiculos/corolla.png", cliente: null },
-    { nome: "Civic",   renavam: "123456789123", marca: "Honda",   placa: "DEF-5678", img: "resources/veiculos/civic.png",   cliente: null },
-    { nome: "Duster",  renavam: "123456789123", marca: "Renault", placa: "GHI-9012", img: "resources/veiculos/duster.png",  cliente: null }
+    { nome: "Corolla", renavam: "123456789123", marca: "Toyota",  placa: "ABC-1234", img: "resources/veiculos/corolla.png", status: "Disponível", cliente: null },
+    { nome: "Civic",   renavam: "123456789123", marca: "Honda",   placa: "DEF-5678", img: "resources/veiculos/civic.png",   status: "Disponível", cliente: null },
+    { nome: "Duster",  renavam: "123456789123", marca: "Renault", placa: "GHI-9012", img: "resources/veiculos/duster.png",  status: "Disponível", cliente: null }
 ];
 
 let clientes = [
@@ -45,9 +54,11 @@ let clientes = [
     }
 ];
 
-let indexCarroSelecionado = null;
+let indexVeiculoSelecionado = null;
 
-// ==================== ACTION BAR CONFIG ====================
+/*
+    CONFIG. ACTION BAR
+*/
 
 const actionBarConfig = {
     "pag-dashboard": {
@@ -58,10 +69,10 @@ const actionBarConfig = {
         title: "Alocação de Veículos",
         actions: []
     },
-    "pag-cadastro-carros": {
+    "pag-cadastro-veiculos": {
         title: "Veículos",
         actions: [
-            { label: "Novo Veículo", onclick: "alternarFormularioCarro()", primary: true }
+            { label: "Novo Veículo", onclick: "alternarFormularioVeiculo()", primary: true }
         ]
     },
     "pag-cadastro-clientes": {
@@ -72,33 +83,32 @@ const actionBarConfig = {
     }
 };
 
-// ==================== INIT ====================
+/*
+    INICIO
+*/
 
 function init() {
     render();
     mostrarPagina("pag-dashboard");
 }
 
-// ==================== RENDER ====================
+/*
+    RENDER
+*/
 
 function render() {
-    renderCardCarros();
+    renderCardsVeiculos();
     renderOpcoesClientes();
     renderDashboard();
-    renderTabelaCarros();
+    renderTabelaVeiculos();
     renderTabelaClientes();
 }
 
-function renderCardCarros() {
-    dom.containerCarros.innerHTML = "";
-    const disponiveis = veiculos.filter(c => c.cliente === null);
-
-    if (disponiveis.length === 0) {
-        dom.msgSemCarros.style.display = "block";
-    } else {
-        dom.msgSemCarros.style.display = "none";
-        disponiveis.forEach(carro => adicionarCardCarro(carro));
-    }
+function renderCardsVeiculos() {
+    dom.containerVeiculos.innerHTML = "";
+    const disponiveis = veiculos.filter(v => v.cliente === null);
+    dom.msgSemVeiculos.style.display = disponiveis.length === 0 ? "block" : "none";
+    disponiveis.forEach(v => adicionarCardVeiculo(v));
 }
 
 function renderOpcoesClientes() {
@@ -112,43 +122,39 @@ function renderOpcoesClientes() {
 }
 
 function renderDashboard() {
-    const alocados = veiculos.filter(c => c.cliente !== null);
+    const alocados = veiculos.filter(v => v.cliente !== null);
 
-    document.getElementById("stat-total-carros").textContent       = veiculos.length;
-    document.getElementById("stat-carros-disponiveis").textContent = veiculos.length - alocados.length;
-    document.getElementById("stat-carros-alocados").textContent    = alocados.length;
-    document.getElementById("stat-total-clientes").textContent     = clientes.length;
+    dom.statTotalVeiculos.textContent = veiculos.length;
+    dom.statDisponiveis.textContent   = veiculos.length - alocados.length;
+    dom.statAlocados.textContent      = alocados.length;
+    dom.statTotalClientes.textContent = clientes.length;
 
-    const listaEl = document.getElementById("lista-alocacoes");
-    if (alocados.length === 0) {
-        listaEl.innerHTML = '<p class="empty-state">Nenhum veículo alocado no momento.</p>';
-    } else {
-        listaEl.innerHTML = alocados.map(c => `
+    dom.listaAlocacoes.innerHTML = alocados.length === 0
+        ? '<p class="empty-state">Nenhum veículo alocado no momento.</p>'
+        : alocados.map(v => `
             <div class="alocacao-item">
-                <span class="veiculo">${c.nome} — ${c.marca}</span>
-                <span class="cliente">${c.cliente.nome}</span>
+                <span class="veiculo">${v.nome} — ${v.marca}</span>
+                <span class="cliente">${v.cliente.nome}</span>
             </div>
         `).join("");
-    }
 }
 
-function renderTabelaCarros() {
-    if (!dom.tbodyCarros) return;
+function renderTabelaVeiculos() {
+    if (!dom.tbodyVeiculos) return;
 
     if (veiculos.length === 0) {
-        dom.tbodyCarros.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum Veículo cadastrado.</td></tr>';
+        dom.tbodyVeiculos.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum Veículo cadastrado.</td></tr>';
         return;
     }
 
-    dom.tbodyCarros.innerHTML = veiculos.map(veiculo => {
-        const statusTexto = veiculo.cliente ? "Alocado" : (veiculo.status || "Disponível");
-        const clienteTexto = veiculo.cliente ? veiculo.cliente.nome : "-";
-
+    dom.tbodyVeiculos.innerHTML = veiculos.map(v => {
+        const statusTexto  = v.cliente ? "Alocado" : (v.status || "Disponível");
+        const clienteTexto = v.cliente ? v.cliente.nome : "-";
         return `
             <tr>
-                <td>${veiculo.nome || "-"}</td>
-                <td>${veiculo.marca || "-"}</td>
-                <td>${veiculo.placa || "-"}</td>
+                <td>${v.nome  || "-"}</td>
+                <td>${v.marca || "-"}</td>
+                <td>${v.placa || "-"}</td>
                 <td>${statusTexto}</td>
                 <td>${clienteTexto}</td>
             </tr>
@@ -164,27 +170,28 @@ function renderTabelaClientes() {
         return;
     }
 
-    dom.tbodyClientes.innerHTML = clientes.map(cliente => {
-        return `
-            <tr>
-                <td>${cliente.nome || "-"}</td>
-                <td>${cliente.cpf || "-"}</td>
-                <td>${cliente.email || "-"}</td>
-                <td>${cliente.telefone || "-"}</td>
-            </tr>
-        `;
-    }).join("");
+    dom.tbodyClientes.innerHTML = clientes.map(c => `
+        <tr>
+            <td>${c.nome     || "-"}</td>
+            <td>${c.cpf      || "-"}</td>
+            <td>${c.email    || "-"}</td>
+            <td>${c.telefone || "-"}</td>
+        </tr>
+    `).join("");
 }
 
-// ==================== NAVEGAÇÃO ====================
+/*
+    NAVEGAÇÃO
+*/
 
 function mostrarPagina(paginaId) {
     Object.values(pages).forEach(page => page.style.display = "none");
-    const page = document.getElementById(paginaId);
-    page.style.display = paginaId === "pag-cadastro-carros" ? "flex" : "block";
 
-    if (paginaId !== "pag-cadastro-carros") {
-        fecharFormularioCarro();
+    const page = pages[paginaId];
+    page.style.display = paginaId === "pag-cadastro-veiculos" ? "flex" : "block";
+
+    if (paginaId !== "pag-cadastro-veiculos") {
+        fecharFormulario(dom.formVeiculos, dom.tabelaVeiculos);
     }
 
     document.querySelectorAll(".nav-item").forEach(item => {
@@ -198,7 +205,9 @@ function mostrarPagina(paginaId) {
     ).join("");
 }
 
-// ==================== MODAL ====================
+/*
+    MODAL (Ver se vai adicionar talvez depois nos formularios de cadastro)
+*/
 
 function abrirModalCliente() {
     dom.modalCliente.style.display = "flex";
@@ -208,50 +217,54 @@ function fecharModal() {
     dom.modalCliente.style.display = "none";
 }
 
-// ==================== CARROS ====================
+/*
+    VEÍCULOS
+*/
 
-function adicionarCardCarro(carro) {
+function adicionarCardVeiculo(veiculo) {
     const card = document.createElement("div");
-    card.classList.add("card-carro");
+    card.classList.add("card-veiculo");
     card.innerHTML = `
-        <img src="${carro.img}" alt="${carro.nome}">
-        <h3>${carro.nome}</h3>
-        <p>${carro.marca}</p>
-        <button onclick="selecionarCarro(${veiculos.indexOf(carro)})">Selecionar</button>
+        <img src="${veiculo.img}" alt="${veiculo.nome}">
+        <h3>${veiculo.nome}</h3>
+        <p>${veiculo.marca}</p>
+        <button onclick="selecionarVeiculo(${veiculos.indexOf(veiculo)})">Selecionar</button>
     `;
-    dom.containerCarros.appendChild(card);
+    dom.containerVeiculos.appendChild(card);
 }
 
-function selecionarCarro(index) {
-    indexCarroSelecionado = index;
+function selecionarVeiculo(index) {
+    indexVeiculoSelecionado = index;
     abrirModalCliente();
 }
 
-function alocarCarro() {
+function alocarVeiculo() {
     const clienteSelecionado = clientes[dom.selectCliente.value];
-    const carroSelecionado   = veiculos[indexCarroSelecionado];
+    const veiculoSelecionado = veiculos[indexVeiculoSelecionado];
 
-    carroSelecionado.cliente = clienteSelecionado;
-    alert(`${carroSelecionado.nome} alocado para ${clienteSelecionado.nome}.`);
+    veiculoSelecionado.cliente = clienteSelecionado;
+    alert(`${veiculoSelecionado.nome} alocado para ${clienteSelecionado.nome}.`);
 
     fecharModal();
     render();
 }
 
-// ==================== CADASTRO ====================
+/*
+    CADASTRO DOS VEÍCULOS
+*/
 
-function cadastrarCarro() {
-    const marca       = document.getElementById("input-marca-carro").value.trim();
-    const modelo      = document.getElementById("input-modelo-carro").value.trim();
-    const ano         = document.getElementById("input-ano-carro").value.trim();
-    const placa       = document.getElementById("input-placa-carro").value.trim();
-    const renavam     = document.getElementById("input-renavam-carro").value.trim();
-    const cor         = document.getElementById("input-cor-carro").value.trim();
-    const km          = document.getElementById("input-km-carro").value.trim();
-    const combustivel = document.getElementById("input-combustivel-carro").value;
-    const valorDiario = document.getElementById("input-valor-diario-carro").value.trim();
-    const status      = document.getElementById("input-status-carro").value;
-    const imagem      = document.getElementById("input-imagem-carro").value.trim();
+function cadastrarVeiculo() {
+    const marca       = document.getElementById("input-marca-veiculo").value.trim();
+    const modelo      = document.getElementById("input-modelo-veiculo").value.trim();
+    const ano         = document.getElementById("input-ano-veiculo").value.trim();
+    const placa       = document.getElementById("input-placa-veiculo").value.trim();
+    const renavam     = document.getElementById("input-renavam-veiculo").value.trim();
+    const cor         = document.getElementById("input-cor-veiculo").value.trim();
+    const km          = document.getElementById("input-km-veiculo").value.trim();
+    const combustivel = document.getElementById("input-combustivel-veiculo").value;
+    const valorDiario = document.getElementById("input-valor-diario-veiculo").value.trim();
+    const status      = document.getElementById("input-status-veiculo").value;
+    const imagem      = document.getElementById("input-imagem-veiculo").value.trim();
 
     if (!marca || !modelo || !placa || !renavam) return;
 
@@ -261,13 +274,8 @@ function cadastrarCarro() {
         status, img: imagem, cliente: null
     });
 
-    [
-        "input-marca-carro", "input-modelo-carro", "input-ano-carro", "input-placa-carro",
-        "input-renavam-carro", "input-cor-carro", "input-km-carro", "input-combustivel-carro",
-        "input-valor-diario-carro", "input-status-carro", "input-imagem-carro"
-    ].forEach(id => { document.getElementById(id).value = ""; });
-
-    fecharFormularioCarro();
+    dom.formVeiculos.reset();
+    fecharFormularioVeiculo();
     render();
 }
 
@@ -293,63 +301,46 @@ function cadastrarCliente() {
         endereco: { cep, estado, cidade, bairro, rua, numero: numEnd, complemento }
     });
 
-    [
-        "input-nome-cliente", "input-cpf-cliente", "input-nascimento-cliente", "input-sexo-cliente",
-        "input-email-cliente", "input-telefone-cliente", "input-cep-cliente", "input-estado-cliente",
-        "input-cidade-cliente", "input-bairro-cliente", "input-rua-cliente",
-        "input-numero-end-cliente", "input-complemento-cliente"
-    ].forEach(id => { document.getElementById(id).value = ""; });
-
+    dom.formClientes.reset();
     renderOpcoesClientes();
     renderDashboard();
 }
 
-// ==================== FORM FOCUS ====================
+/*
+    FORMULÁRIOS DE CADASTRO
+*/
 
-function alternarFormularioCarro() {
-    if (!dom.formCarros) return;
-
-    if (dom.formCarros.style.display == "block") {
-        fecharFormularioCarro();
-        dom.tabelaCarros.style.display = "block";
-        return;
-    }
-
-    dom.tabelaCarros.style.display = "none";
-    dom.formCarros.style.display = "block";
+function alternarFormulario(form, tabela) {
+    const abrindo    = form.style.display !== "block";
+    form.style.display   = abrindo ? "block" : "none";
+    tabela.style.display = abrindo ? "none"  : "block";
 }
 
-function fecharFormularioCarro() {
-    if (dom.formCarros) {
-        dom.formCarros.style.display = "none";
-        dom.tabelaCarros.style.display = "block";
+function fecharFormulario(form, tabela) {
+    if (form) {
+        form.style.display   = "none";
+        tabela.style.display = "block";
     }
+}
+
+function alternarFormularioVeiculo() {
+    if (dom.formVeiculos) alternarFormulario(dom.formVeiculos, dom.tabelaVeiculos);
+}
+
+function fecharFormularioVeiculo() {
+    fecharFormulario(dom.formVeiculos, dom.tabelaVeiculos);
 }
 
 function alternarFormularioCliente() {
-    if (!dom.formClientes) return;
-
-    if (dom.formClientes.style.display == "block") {
-        fecharFormularioCliente();
-        dom.tabelaClientes.style.display = "block";
-        return;
-    }
-
-    dom.tabelaClientes.style.display = "none";
-    dom.formClientes.style.display = "block";
+    if (dom.formClientes) alternarFormulario(dom.formClientes, dom.tabelaClientes);
 }
 
 function fecharFormularioCliente() {
-    if (dom.formClientes) {
-        dom.formClientes.style.display = "none";
-        dom.tabelaClientes.style.display = "block";
-    }
+    fecharFormulario(dom.formClientes, dom.tabelaClientes);
 }
 
-function focarFormCliente() {
-    document.getElementById("input-nome-cliente").focus();
-}
-
-// ==================== START ====================
+/*
+    INÍCIO
+*/
 
 init();

@@ -23,8 +23,8 @@
                     onclick="mostrarPagina('pag-dashboard')">Dashboard</a>
                 <a href="#" class="nav-item" data-page="pag-alocacao"
                     onclick="mostrarPagina('pag-alocacao')">Alocação</a>
-                <a href="#" class="nav-item" data-page="pag-cadastro-carros"
-                    onclick="mostrarPagina('pag-cadastro-carros')">Veículos</a>
+                <a href="#" class="nav-item" data-page="pag-cadastro-veiculos"
+                    onclick="mostrarPagina('pag-cadastro-veiculos')">Veículos</a>
                 <a href="#" class="nav-item" data-page="pag-cadastro-clientes"
                     onclick="mostrarPagina('pag-cadastro-clientes')">Clientes</a>
             </nav>
@@ -33,7 +33,7 @@
         <!-- Área Principal -->
         <div id="main">
 
-            <!-- Barra de Ações -->
+            <!-- Barra de Ações ex: Cadastrar Veiculo/Cliente -->
             <div id="action-bar">
                 <h2 id="action-bar-title"></h2>
                 <div id="action-bar-actions"></div>
@@ -47,15 +47,15 @@
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-label">Total de Veículos</div>
-                            <div class="stat-value" id="stat-total-carros">0</div>
+                            <div class="stat-value" id="stat-total-veiculos">0</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Disponíveis</div>
-                            <div class="stat-value" id="stat-carros-disponiveis">0</div>
+                            <div class="stat-value" id="stat-veiculos-disponiveis">0</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Alocados</div>
-                            <div class="stat-value" id="stat-carros-alocados">0</div>
+                            <div class="stat-value" id="stat-veiculos-alocados">0</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-label">Total de Clientes</div>
@@ -71,8 +71,8 @@
 
                 <!-- Alocação -->
                 <div id="pag-alocacao">
-                    <div id="container-carros"></div>
-                    <p id="msg-sem-carros">Nenhum veículo disponível para alocação.</p>
+                    <div id="container-veiculos"></div>
+                    <p id="msg-sem-veiculos">Nenhum veículo disponível para alocação.</p>
 
                     <div id="modal-cliente" class="modal">
                         <div class="modal-conteudo">
@@ -80,15 +80,17 @@
                             <select id="checkbox-cliente-alocar"></select>
                             <div id="alocar-fechar">
                                 <button onclick="fecharModal()">Cancelar</button>
-                                <button id="btn-alocar" onclick="alocarCarro()">Alocar</button>
+                                <button id="btn-alocar" onclick="alocarVeiculo()">Alocar</button>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Cadastro de Veículos -->
-                <div id="pag-cadastro-carros" class="pag-cadastro">
-                    <div class="table-section" id="tabela-carros">
+                <!-- Aba Veículos -->
+                <div id="pag-cadastro-veiculos" class="pag-cadastro">
+
+                    <!-- Tabela Veículos -->
+                    <div class="table-section" id="tabela-veiculos">
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -99,33 +101,34 @@
                                     <th>Cliente</th>
                                 </tr>
                             </thead>
-                            <tbody id="tbody-carros"></tbody>
+                            <tbody id="tbody-veiculos"></tbody>
                         </table>
                     </div>
 
-                    <div id="form-cadastrar-carro" class="form-cadastrar" style="display: none;">
+                    <!-- Formulário de Cadastro de Veiculos -->
+                    <form id="form-cadastrar-veiculo" class="form-cadastrar" style="display: none;">
                         <div class="form-section">
                             <h4>Identificação</h4>
                             <div class="form-row">
-                                <input type="text" id="input-marca-carro" placeholder="Marca">
-                                <input type="text" id="input-modelo-carro" placeholder="Modelo">
+                                <input type="text" id="input-marca-veiculo" placeholder="Marca">
+                                <input type="text" id="input-modelo-veiculo" placeholder="Modelo">
                             </div>
                             <div class="form-row">
-                                <input type="number" id="input-ano-carro" placeholder="Ano de Fabricação" min="1900"
+                                <input type="number" id="input-ano-veiculo" placeholder="Ano de Fabricação" min="1900"
                                     max="2030">
-                                <input type="text" id="input-placa-carro" placeholder="Placa (ABC-1234)">
+                                <input type="text" id="input-placa-veiculo" placeholder="Placa (ABC-1234)">
                             </div>
-                            <input type="text" id="input-renavam-carro" placeholder="RENAVAM">
+                            <input type="text" id="input-renavam-veiculo" placeholder="RENAVAM">
                         </div>
 
                         <div class="form-section">
                             <h4>Características</h4>
                             <div class="form-row">
-                                <input type="text" id="input-cor-carro" placeholder="Cor">
-                                <input type="number" id="input-km-carro" placeholder="KM Atual" min="0">
+                                <input type="text" id="input-cor-veiculo" placeholder="Cor">
+                                <input type="number" id="input-km-veiculo" placeholder="KM Atual" min="0">
                             </div>
                             <div class="form-row">
-                                <select id="input-combustivel-carro">
+                                <select id="input-combustivel-veiculo">
                                     <option value="" disabled selected>Combustível</option>
                                     <option value="Gasolina">Gasolina</option>
                                     <option value="Etanol">Etanol</option>
@@ -135,28 +138,30 @@
                                     <option value="Elétrico">Elétrico</option>
                                     <option value="Híbrido">Híbrido</option>
                                 </select>
-                                <input type="number" id="input-valor-diario-carro" placeholder="Valor Diário (R$)"
+                                <input type="number" id="input-valor-diario-veiculo" placeholder="Valor Diário (R$)"
                                     min="0" step="0.01">
                             </div>
-                            <select id="input-status-carro">
+                            <select id="input-status-veiculo">
                                 <option value="" disabled selected>Status</option>
                                 <option value="Disponível">Disponível</option>
                                 <option value="Alugado">Alugado</option>
                                 <option value="Em manutenção">Em manutenção</option>
                             </select>
-                            <input type="text" id="input-imagem-carro" placeholder="URL da Imagem (opcional)">
+                            <input type="text" id="input-imagem-veiculo" placeholder="URL da Imagem (opcional)">
                         </div>
 
                         <div class="form-actions">
                             <button type="button" class="btn-cancelar"
-                                onclick="fecharFormularioCarro()">Cancelar</button>
-                            <button type="button" onclick="cadastrarCarro()">Cadastrar Veículo</button>
+                                onclick="fecharFormularioVeiculo()">Cancelar</button>
+                            <button type="button" onclick="cadastrarVeiculo()">Cadastrar Veículo</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
-                <!-- Cadastro de Clientes -->
+                <!-- Aba Clientes -->
                 <div id="pag-cadastro-clientes" class="pag-cadastro">
+
+                    <!-- Tabela Clientes -->
                     <div class="table-section" id="tabela-clientes">
                         <table class="data-table">
                             <thead>
@@ -171,7 +176,8 @@
                         </table>
                     </div>
 
-                    <div id="form-cadastrar-clientes" class="form-cadastrar" style="display: none;">
+                    <!-- Formulário de Cadastro dos Clientes -->
+                    <form id="form-cadastrar-clientes" class="form-cadastrar" style="display: none;">
                         <div class="form-section">
                             <h4>Dados Pessoais</h4>
                             <input type="text" id="input-nome-cliente" placeholder="Nome completo">
@@ -212,7 +218,7 @@
                                 onclick="fecharFormularioCliente()">Cancelar</button>
                             <button type="button" onclick="cadastrarCliente()">Cadastrar Cliente</button>
                         </div>
-                    </div>
+                    </form>
                 </div>
 
             </div>
