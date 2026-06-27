@@ -148,6 +148,12 @@ body {
     display: none;
 }
 
+#pag-cadastro-carros {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
+
 .stats-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
@@ -277,6 +283,71 @@ body {
     color: #aaa;
 }
 
+.form-cadastrar { /**/
+    /* max-width: 480px; */
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+}
+
+.form-actions button {
+    padding: 8px 14px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.form-actions button:first-child {
+    background-color: #e5e9ef;
+    color: #334155;
+}
+
+.form-actions button:last-child {
+    background-color: #3c4d5f;
+    color: white;
+}
+
+.table-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e4e7eb;
+}
+
+.data-table th {
+    background-color: #f7f9fc;
+    color: #556070;
+    font-weight: 600;
+}
+
+.data-table tr:hover {
+    background-color: #fafbfc;
+}
+
 /* ===== MODAL ===== */
 
 .modal {
@@ -351,7 +422,7 @@ body {
 
 .pag-cadastro {
     display: none;
-    max-width: 480px;
+    /* max-width: 480px; */
 }
 
 .pag-cadastro input,

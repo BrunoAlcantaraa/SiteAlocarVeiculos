@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Alugue Fácil</title>
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
     <div id="layout">
@@ -18,13 +20,13 @@
             </div>
             <nav id="sidebar-nav">
                 <a href="#" class="nav-item" data-page="pag-dashboard"
-                   onclick="mostrarPagina('pag-dashboard')">Dashboard</a>
+                    onclick="mostrarPagina('pag-dashboard')">Dashboard</a>
                 <a href="#" class="nav-item" data-page="pag-alocacao"
-                   onclick="mostrarPagina('pag-alocacao')">Alocação</a>
+                    onclick="mostrarPagina('pag-alocacao')">Alocação</a>
                 <a href="#" class="nav-item" data-page="pag-cadastro-carros"
-                   onclick="mostrarPagina('pag-cadastro-carros')">Veículos</a>
+                    onclick="mostrarPagina('pag-cadastro-carros')">Veículos</a>
                 <a href="#" class="nav-item" data-page="pag-cadastro-clientes"
-                   onclick="mostrarPagina('pag-cadastro-clientes')">Clientes</a>
+                    onclick="mostrarPagina('pag-cadastro-clientes')">Clientes</a>
             </nav>
         </aside>
 
@@ -86,88 +88,131 @@
 
                 <!-- Cadastro de Veículos -->
                 <div id="pag-cadastro-carros" class="pag-cadastro">
-                    <div class="form-section">
-                        <h4>Identificação</h4>
-                        <div class="form-row">
-                            <input type="text" id="input-marca-carro" placeholder="Marca">
-                            <input type="text" id="input-modelo-carro" placeholder="Modelo">
-                        </div>
-                        <div class="form-row">
-                            <input type="number" id="input-ano-carro" placeholder="Ano de Fabricação" min="1900" max="2030">
-                            <input type="text" id="input-placa-carro" placeholder="Placa (ABC-1234)">
-                        </div>
-                        <input type="text" id="input-renavam-carro" placeholder="RENAVAM">
+                    <div class="table-section" id="tabela-carros">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Modelo</th>
+                                    <th>Marca</th>
+                                    <th>Placa</th>
+                                    <th>Status</th>
+                                    <th>Cliente</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-carros"></tbody>
+                        </table>
                     </div>
 
-                    <div class="form-section">
-                        <h4>Características</h4>
-                        <div class="form-row">
-                            <input type="text" id="input-cor-carro" placeholder="Cor">
-                            <input type="number" id="input-km-carro" placeholder="KM Atual" min="0">
+                    <div id="form-cadastrar-carro" class="form-cadastrar" style="display: none;">
+                        <div class="form-section">
+                            <h4>Identificação</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-marca-carro" placeholder="Marca">
+                                <input type="text" id="input-modelo-carro" placeholder="Modelo">
+                            </div>
+                            <div class="form-row">
+                                <input type="number" id="input-ano-carro" placeholder="Ano de Fabricação" min="1900"
+                                    max="2030">
+                                <input type="text" id="input-placa-carro" placeholder="Placa (ABC-1234)">
+                            </div>
+                            <input type="text" id="input-renavam-carro" placeholder="RENAVAM">
                         </div>
-                        <div class="form-row">
-                            <select id="input-combustivel-carro">
-                                <option value="" disabled selected>Combustível</option>
-                                <option value="Gasolina">Gasolina</option>
-                                <option value="Etanol">Etanol</option>
-                                <option value="Flex">Flex</option>
-                                <option value="Diesel">Diesel</option>
-                                <option value="GNV">GNV</option>
-                                <option value="Elétrico">Elétrico</option>
-                                <option value="Híbrido">Híbrido</option>
+
+                        <div class="form-section">
+                            <h4>Características</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-cor-carro" placeholder="Cor">
+                                <input type="number" id="input-km-carro" placeholder="KM Atual" min="0">
+                            </div>
+                            <div class="form-row">
+                                <select id="input-combustivel-carro">
+                                    <option value="" disabled selected>Combustível</option>
+                                    <option value="Gasolina">Gasolina</option>
+                                    <option value="Etanol">Etanol</option>
+                                    <option value="Flex">Flex</option>
+                                    <option value="Diesel">Diesel</option>
+                                    <option value="GNV">GNV</option>
+                                    <option value="Elétrico">Elétrico</option>
+                                    <option value="Híbrido">Híbrido</option>
+                                </select>
+                                <input type="number" id="input-valor-diario-carro" placeholder="Valor Diário (R$)"
+                                    min="0" step="0.01">
+                            </div>
+                            <select id="input-status-carro">
+                                <option value="" disabled selected>Status</option>
+                                <option value="Disponível">Disponível</option>
+                                <option value="Alugado">Alugado</option>
+                                <option value="Em manutenção">Em manutenção</option>
                             </select>
-                            <input type="number" id="input-valor-diario-carro" placeholder="Valor Diário (R$)" min="0" step="0.01">
+                            <input type="text" id="input-imagem-carro" placeholder="URL da Imagem (opcional)">
                         </div>
-                        <select id="input-status-carro">
-                            <option value="" disabled selected>Status</option>
-                            <option value="Disponível">Disponível</option>
-                            <option value="Alugado">Alugado</option>
-                            <option value="Em manutenção">Em manutenção</option>
-                        </select>
-                        <input type="text" id="input-imagem-carro" placeholder="URL da Imagem (opcional)">
-                    </div>
 
-                    <button onclick="cadastrarCarro()">Cadastrar Veículo</button>
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancelar"
+                                onclick="fecharFormularioCarro()">Cancelar</button>
+                            <button type="button" onclick="cadastrarCarro()">Cadastrar Veículo</button>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Cadastro de Clientes -->
                 <div id="pag-cadastro-clientes" class="pag-cadastro">
-                    <div class="form-section">
-                        <h4>Dados Pessoais</h4>
-                        <input type="text" id="input-nome-cliente" placeholder="Nome completo">
-                        <input type="text" id="input-cpf-cliente" placeholder="CPF (000.000.000-00)">
-                        <div class="form-row">
-                            <input type="date" id="input-nascimento-cliente" title="Data de Nascimento">
-                            <select id="input-sexo-cliente">
-                                <option value="" disabled selected>Sexo</option>
-                                <option value="M">Masculino</option>
-                                <option value="F">Feminino</option>
-                            </select>
-                        </div>
-                        <input type="email" id="input-email-cliente" placeholder="E-mail">
+                    <div class="table-section" id="tabela-clientes">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-clientes"></tbody>
+                        </table>
                     </div>
 
-                    <div class="form-section">
-                        <h4>Telefone</h4>
-                        <input type="text" id="input-telefone-cliente" placeholder="Telefone">
-                    </div>
-
-                    <div class="form-section">
-                        <h4>Endereço</h4>
-                        <div class="form-row">
-                            <input type="text" id="input-cep-cliente" placeholder="CEP">
-                            <input type="text" id="input-estado-cliente" placeholder="Estado (UF)" maxlength="2">
+                    <div id="form-cadastrar-clientes" class="form-cadastrar" style="display: none;">
+                        <div class="form-section">
+                            <h4>Dados Pessoais</h4>
+                            <input type="text" id="input-nome-cliente" placeholder="Nome completo">
+                            <input type="text" id="input-cpf-cliente" placeholder="CPF (000.000.000-00)">
+                            <div class="form-row">
+                                <input type="date" id="input-nascimento-cliente" title="Data de Nascimento">
+                                <select id="input-sexo-cliente">
+                                    <option value="" disabled selected>Sexo</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                </select>
+                            </div>
+                            <input type="email" id="input-email-cliente" placeholder="E-mail">
                         </div>
-                        <input type="text" id="input-cidade-cliente" placeholder="Cidade">
-                        <input type="text" id="input-bairro-cliente" placeholder="Bairro">
-                        <div class="form-row">
-                            <input type="text" id="input-rua-cliente" placeholder="Rua">
-                            <input type="text" id="input-numero-end-cliente" placeholder="Número">
-                        </div>
-                        <input type="text" id="input-complemento-cliente" placeholder="Complemento (opcional)">
-                    </div>
 
-                    <button onclick="cadastrarCliente()">Cadastrar Cliente</button>
+                        <div class="form-section">
+                            <h4>Telefone</h4>
+                            <input type="text" id="input-telefone-cliente" placeholder="Telefone">
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Endereço</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-cep-cliente" placeholder="CEP">
+                                <input type="text" id="input-estado-cliente" placeholder="Estado (UF)" maxlength="2">
+                            </div>
+                            <input type="text" id="input-cidade-cliente" placeholder="Cidade">
+                            <input type="text" id="input-bairro-cliente" placeholder="Bairro">
+                            <div class="form-row">
+                                <input type="text" id="input-rua-cliente" placeholder="Rua">
+                                <input type="text" id="input-numero-end-cliente" placeholder="Número">
+                            </div>
+                            <input type="text" id="input-complemento-cliente" placeholder="Complemento (opcional)">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancelar"
+                                onclick="fecharFormularioCliente()">Cancelar</button>
+                            <button type="button" onclick="cadastrarCliente()">Cadastrar Cliente</button>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -176,4 +221,5 @@
 
     <script src="script.js"></script>
 </body>
+
 </html>
