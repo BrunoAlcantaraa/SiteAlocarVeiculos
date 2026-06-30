@@ -192,10 +192,11 @@ function fazerLogout() {
         localStorage.removeItem("usuarioLogado");
         sessionStorage.clear();
 
-        dom.loginScreen.style.display = "block";
         dom.layout.style.display = "none";
+        dom.loginScreen.style.display = "flex";
 
         document.getElementById("form-login").reset();
+        document.getElementById("login-erro").textContent = "";
         document.getElementById("input-login-usuario").focus();
     }
 }

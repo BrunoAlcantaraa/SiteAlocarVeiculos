@@ -688,6 +688,7 @@ body {
 }
 
 .form-cadastrar {
+    width: 100%;
     background: #fff;
     border-radius: 8px;
     padding: 20px;
@@ -928,26 +929,28 @@ body {
    LOGOUT
    ===================== */
 
-.nav-separator {
-    height: 1px;
-    background-color: rgba(255, 255, 255, 0.08);
-    margin: 10px 0;
+#sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .nav-logout {
-    color: rgba(255, 255, 255, 0.52) !important;
-    border-left-color: transparent !important;
-    background: none;
+    background: white;
+    border: none;
+    font-weight: bold;
     font-family: Arial, sans-serif;
-    font-size: 14px;
+    font-size: 12px;
     cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
     width: 100%;
     text-align: left;
+    transition: color 0.15s, background-color 0.15s;
 }
 
 .nav-logout:hover {
-    color: #d32f2f !important;
-    background-color: rgba(255, 64, 64, 0.08) !important;
+    color: rgba(255, 100, 100, 0.8);
+    background-color: rgba(255, 64, 64, 0.07);
 }
 
 /* =====================
