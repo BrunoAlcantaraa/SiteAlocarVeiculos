@@ -6,22 +6,28 @@ const pages = {
     "pag-dashboard": document.getElementById("pag-dashboard"),
     "pag-alocacao": document.getElementById("pag-alocacao"),
     "pag-cadastro-veiculos": document.getElementById("pag-cadastro-veiculos"),
-    "pag-cadastro-clientes": document.getElementById("pag-cadastro-clientes")
+    "pag-cadastro-clientes": document.getElementById("pag-cadastro-clientes"),
+    "pag-cadastro-funcionarios": document.getElementById("pag-cadastro-funcionarios")
 };
 
 const dom = {
     loginScreen: document.getElementById("login-screen"),
     layout: document.getElementById("layout"),
-    containerVeiculos: document.getElementById("container-veiculos"),
-    msgSemVeiculos: document.getElementById("msg-sem-veiculos"),
     actionBarTitle: document.getElementById("action-bar-title"),
     actionBarActions: document.getElementById("action-bar-actions"),
+    // veículos
     tbodyVeiculos: document.getElementById("tbody-veiculos"),
     tabelaVeiculos: document.getElementById("tabela-veiculos"),
     formVeiculos: document.getElementById("form-cadastrar-veiculo"),
+    // clientes
     tbodyClientes: document.getElementById("tbody-clientes"),
     tabelaClientes: document.getElementById("tabela-clientes"),
     formClientes: document.getElementById("form-cadastrar-clientes"),
+    // funcionários
+    tbodyFuncionarios: document.getElementById("tbody-funcionarios"),
+    tabelaFuncionarios: document.getElementById("tabela-funcionarios"),
+    formFuncionarios: document.getElementById("form-cadastrar-funcionario"),
+    // dashboard
     statTotalVeiculos: document.getElementById("stat-total-veiculos"),
     statDisponiveis: document.getElementById("stat-veiculos-disponiveis"),
     statAlocados: document.getElementById("stat-veiculos-alocados"),
@@ -43,8 +49,9 @@ let veiculos = [
     {
         id: 2, nome: "Civic", renavam: "98765432109", marca: "Honda",
         ano: 2021, placa: "DEF-5678", img: "resources/veiculos/civic.png",
-        status: "Disponível", cor: "Cinza Metálico", combustivel: "Gasolina",
-        km_atual: 32000, valor_diario: 200.00, cliente: null
+        status: "Alugado", cor: "Cinza Metálico", combustivel: "Gasolina",
+        km_atual: 32000, valor_diario: 200.00,
+        cliente: { nome: "Bruno Alcantara", cpf: "123.456.789-01" }
     },
     {
         id: 3, nome: "Duster", renavam: "45678912345", marca: "Renault",
@@ -70,9 +77,24 @@ let clientes = [
 ];
 
 let funcionarios = [
-    { id: 1, nome: "Ana Silva", cargo: "Atendente" },
-    { id: 2, nome: "Carlos Souza", cargo: "Gerente" },
-    { id: 3, nome: "Mariana Costa", cargo: "Atendente" }
+    { id: 1, nome: "Ana Silva", cpf: "111.222.333-44", email: "ana@email.com", telefone: "(45) 99111-2222", cargo: "Atendente", salario: 2500.00, admissao: "2023-01-15" },
+    { id: 2, nome: "Carlos Souza", cpf: "222.333.444-55", email: "carlos@email.com", telefone: "(45) 99333-4444", cargo: "Gerente", salario: 5000.00, admissao: "2022-03-10" },
+    { id: 3, nome: "Mariana Costa", cpf: "333.444.555-66", email: "mariana@email.com", telefone: "(45) 99555-6666", cargo: "Atendente", salario: 2500.00, admissao: "2023-06-20" }
+];
+
+let locacoes = [
+    {
+        id: 1,
+        idx_veiculo: 1,
+        idx_cliente: 0,
+        idx_funcionario: 0,
+        data_saida: "2026-06-25",
+        data_retorno_prevista: "2026-07-02",
+        km_saida: 32000,
+        status: "Ativo",
+        forma_pagamento: "PIX",
+        valor_entrada: 200.00
+    }
 ];
 
 const estadosCidades = {
@@ -131,6 +153,12 @@ const actionBarConfig = {
         actions: [
             { label: "Novo Cliente", onclick: "alternarFormularioCliente()", primary: true }
         ]
+    },
+    "pag-cadastro-funcionarios": {
+        title: "Funcionários",
+        actions: [
+            { label: "Novo Funcionário", onclick: "alternarFormularioFuncionario()", primary: true }
+        ]
     }
 };
 
@@ -149,14 +177,27 @@ function fazerLogin(event) {
         return;
     }
 
-    // Futuramente: substituir por chamada à API de autenticação
-    // const autenticado = await api.autenticar({ usuario, senha });
-    // if (!autenticado) { erro.textContent = "Usuário ou senha inválidos."; return; }
-
     erro.textContent = "";
     dom.loginScreen.style.display = "none";
     dom.layout.style.display = "flex";
     init();
+}
+
+/*
+    LOGOUT
+*/
+
+function fazerLogout() {
+    if (confirm("Tem certeza que deseja sair?")) {
+        localStorage.removeItem("usuarioLogado");
+        sessionStorage.clear();
+
+        dom.loginScreen.style.display = "block";
+        dom.layout.style.display = "none";
+
+        document.getElementById("form-login").reset();
+        document.getElementById("input-login-usuario").focus();
+    }
 }
 
 /*
@@ -174,29 +215,122 @@ function init() {
 
 function render() {
     limparBuscas();
-    renderCardsVeiculos();
+    renderSecaoDisponiveis();
+    renderSecaoReservados();
     renderDashboard();
     renderTabelaVeiculos();
     renderTabelaClientes();
+    renderTabelaFuncionarios();
 }
 
 function limparBuscas() {
-    ["busca-alocacao", "busca-veiculos", "busca-clientes"].forEach(id => {
+    ["busca-alocacao", "busca-veiculos", "busca-clientes", "busca-funcionarios"].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.value = "";
     });
 }
 
-function renderCardsVeiculos(dados) {
-    const lista = dados !== undefined ? dados : veiculos;
-    dom.containerVeiculos.innerHTML = "";
-    dom.msgSemVeiculos.style.display = lista.length === 0 ? "block" : "none";
-    lista.forEach(v => adicionarCardVeiculo(v));
+function alternarVisaoAlocacao(view) {
+    document.querySelectorAll(".alocacao-toggle-btn").forEach(btn => {
+        btn.classList.toggle("active", btn.dataset.view === view);
+    });
+
+    document.querySelectorAll(".alocacao-view-panel").forEach(panel => {
+        panel.classList.toggle("active", panel.id === `alocacao-view-${view}`);
+    });
+}
+
+/*
+    ALOCAÇÃO — SEÇÃO DISPONÍVEIS
+*/
+
+function renderSecaoDisponiveis(dados) {
+    const lista = dados !== undefined ? dados : veiculos.filter(v => veiculoDisponivel(v));
+    const container = document.getElementById("alocacao-disponiveis");
+    const msg = document.getElementById("msg-sem-disponiveis");
+    if (!container) return;
+    container.innerHTML = "";
+    if (msg) msg.style.display = lista.length === 0 ? "block" : "none";
+    lista.forEach(v => {
+        const idx = veiculos.indexOf(v);
+        container.appendChild(criarCardDisponivel(v, idx));
+    });
+}
+
+function criarCardDisponivel(v, idx) {
+    const card = document.createElement("div");
+    card.className = "card-veiculo";
+    card.innerHTML = `
+        <div class="card-img-wrapper">
+            <img src="${v.img || ""}" alt="${v.nome || "Veículo"}">
+        </div>
+        <div class="card-info-list">
+            <div class="card-info-row"><span class="card-info-label">Marca</span><span class="card-info-val">${v.marca || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Modelo</span><span class="card-info-val">${v.nome || "—"} ${v.ano ? "(" + v.ano + ")" : ""}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Placa</span><span class="card-info-val">${v.placa || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Cor</span><span class="card-info-val">${v.cor || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Combustível</span><span class="card-info-val">${v.combustivel || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">KM Atual</span><span class="card-info-val">${v.km_atual != null ? v.km_atual.toLocaleString("pt-BR") + " km" : "—"}</span></div>
+            <div class="card-info-row card-info-preco"><span class="card-info-label">Valor Diário</span><span class="card-info-val">R$ ${v.valor_diario != null ? formatarMoeda(v.valor_diario) : "—"}</span></div>
+        </div>
+        <button class="btn-selecionar btn-alocar" onclick="selecionarVeiculo(${idx})">Alocar Veículo</button>
+    `;
+    return card;
+}
+
+/*
+    ALOCAÇÃO — SEÇÃO RESERVADOS
+*/
+
+function renderSecaoReservados(dados) {
+    const lista = dados !== undefined ? dados : veiculos.filter(v => !veiculoDisponivel(v));
+    const container = document.getElementById("alocacao-reservados");
+    const msg = document.getElementById("msg-sem-reservados");
+    if (!container) return;
+    container.innerHTML = "";
+    if (msg) msg.style.display = lista.length === 0 ? "block" : "none";
+    lista.forEach(v => {
+        const idx = veiculos.indexOf(v);
+        container.appendChild(criarCardReservado(v, idx));
+    });
+}
+
+function criarCardReservado(v, idx) {
+    const locacao = locacoes.find(l => l.idx_veiculo === idx);
+    const clienteNome = locacao ? (clientes[locacao.idx_cliente]?.nome || "—") : "—";
+    const dataSaida = locacao ? formatarData(locacao.data_saida) : "—";
+    const dataRetorno = locacao ? formatarData(locacao.data_retorno_prevista) : "—";
+    const kmSaida = locacao ? locacao.km_saida.toLocaleString("pt-BR") + " km" : "—";
+    const statusLoc = locacao ? locacao.status : (v.status || "—");
+
+    const btnHtml = locacao
+        ? `<button class="btn-selecionar btn-finalizar" onclick="abrirFormFinalizacao(${idx})">Finalizar Locação</button>`
+        : `<button class="btn-selecionar" style="background:#aaa;cursor:default" disabled>${v.status}</button>`;
+
+    const card = document.createElement("div");
+    card.className = "card-veiculo";
+    card.innerHTML = `
+        <div class="card-img-wrapper">
+            <img src="${v.img || ""}" alt="${v.nome || "Veículo"}">
+        </div>
+        <div class="card-info-list">
+            <div class="card-info-row"><span class="card-info-label">Marca</span><span class="card-info-val">${v.marca || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Modelo</span><span class="card-info-val">${v.nome || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Placa</span><span class="card-info-val">${v.placa || "—"}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Cliente</span><span class="card-info-val">${clienteNome}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Data Saída</span><span class="card-info-val">${dataSaida}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Retorno Previsto</span><span class="card-info-val">${dataRetorno}</span></div>
+            <div class="card-info-row"><span class="card-info-label">KM Saída</span><span class="card-info-val">${kmSaida}</span></div>
+            <div class="card-info-row"><span class="card-info-label">Status</span><span class="card-info-val">${statusLoc}</span></div>
+        </div>
+        ${btnHtml}
+    `;
+    return card;
 }
 
 function renderDashboard() {
     const alocados = veiculos.filter(v => v.cliente !== null);
-    const disponiveis = veiculos.filter(v => !v.cliente && v.status === "Disponível");
+    const disponiveis = veiculos.filter(v => veiculoDisponivel(v));
 
     dom.statTotalVeiculos.textContent = veiculos.length;
     dom.statDisponiveis.textContent = disponiveis.length;
@@ -256,6 +390,30 @@ function renderTabelaClientes(dados) {
     `).join("");
 }
 
+function renderTabelaFuncionarios(dados) {
+    if (!dom.tbodyFuncionarios) return;
+    const lista = dados !== undefined ? dados : funcionarios;
+
+    if (lista.length === 0) {
+        dom.tbodyFuncionarios.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum funcionário encontrado.</td></tr>';
+        return;
+    }
+
+    dom.tbodyFuncionarios.innerHTML = lista.map(f => `
+        <tr>
+            <td>${f.nome || "—"}</td>
+            <td>${f.cpf || "—"}</td>
+            <td>${f.email || "—"}</td>
+            <td>${f.telefone || "—"}</td>
+            <td>${f.cargo || "—"}</td>
+            <td>${f.salario != null ? "R$ " + formatarMoeda(f.salario) : "—"}</td>
+            <td>
+                <button class="btn-action outline" onclick="deletarFuncionario(${funcionarios.indexOf(f)})" style="font-size:11px;padding:4px 10px;color:#c0392b;border-color:#f5c6cb">Excluir</button>
+            </td>
+        </tr>
+    `).join("");
+}
+
 /*
     BUSCA / FILTRO
 */
@@ -290,7 +448,24 @@ function filtrarTabelaClientes(termo) {
 }
 
 function filtrarVeiculosAlocacao(termo) {
-    renderCardsVeiculos(buscarVeiculos(termo));
+    const resultado = buscarVeiculos(termo);
+    renderSecaoDisponiveis(resultado.filter(v => veiculoDisponivel(v)));
+    renderSecaoReservados(resultado.filter(v => !veiculoDisponivel(v)));
+}
+
+function filtrarTabelaFuncionarios(termo) {
+    if (!termo) {
+        renderTabelaFuncionarios();
+        return;
+    }
+    const t = termo.toLowerCase();
+    const filtrados = funcionarios.filter(f =>
+        (f.nome || "").toLowerCase().includes(t) ||
+        (f.cpf || "").toLowerCase().includes(t) ||
+        (f.email || "").toLowerCase().includes(t) ||
+        (f.cargo || "").toLowerCase().includes(t)
+    );
+    renderTabelaFuncionarios(filtrados);
 }
 
 /*
@@ -298,16 +473,21 @@ function filtrarVeiculosAlocacao(termo) {
 */
 
 function mostrarPagina(paginaId) {
-    // Volta para grade ao sair da página de alocação
     voltarParaVeiculos();
 
-    Object.values(pages).forEach(page => page.style.display = "none");
+    Object.values(pages).forEach(page => { if (page) page.style.display = "none"; });
 
     const page = pages[paginaId];
-    page.style.display = paginaId === "pag-cadastro-veiculos" ? "flex" : "block";
+    if (!page) return;
+
+    const flexPages = ["pag-cadastro-veiculos", "pag-cadastro-funcionarios"];
+    page.style.display = flexPages.includes(paginaId) ? "flex" : "block";
 
     if (paginaId !== "pag-cadastro-veiculos") {
         fecharFormulario(dom.formVeiculos, dom.tabelaVeiculos);
+    }
+    if (paginaId !== "pag-cadastro-funcionarios") {
+        fecharFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
     }
 
     document.querySelectorAll(".nav-item").forEach(item => {
@@ -315,6 +495,7 @@ function mostrarPagina(paginaId) {
     });
 
     const config = actionBarConfig[paginaId];
+    if (!config) return;
     dom.actionBarTitle.textContent = config.title;
     dom.actionBarActions.innerHTML = config.actions.map(action =>
         `<button class="btn-action${action.primary ? "" : " outline"}" onclick="${action.onclick}">${action.label}</button>`
@@ -322,8 +503,12 @@ function mostrarPagina(paginaId) {
 }
 
 /*
-    CARDS DE VEÍCULO
+    HELPERS DE STATUS
 */
+
+function veiculoDisponivel(v) {
+    return v.cliente === null && v.status === "Disponível";
+}
 
 function getStatusVeiculo(v) {
     if (v.cliente !== null) return "Alugado";
@@ -337,46 +522,6 @@ function getBadgeClass(status) {
         case "Em manutenção": return "badge-manutencao";
         default: return "badge-disponivel";
     }
-}
-
-function veiculoDisponivel(v) {
-    return v.cliente === null && v.status === "Disponível";
-}
-
-function adicionarCardVeiculo(veiculo) {
-    const idx = veiculos.indexOf(veiculo);
-    const status = getStatusVeiculo(veiculo);
-    const disponivel = veiculoDisponivel(veiculo);
-    const preco = veiculo.valor_diario
-        ? `R$ ${formatarMoeda(veiculo.valor_diario)}/dia`
-        : "—";
-
-    const card = document.createElement("div");
-    card.classList.add("card-veiculo");
-    if (!disponivel) card.classList.add("card-indisponivel");
-
-    let msgBloqueio = "";
-    if (status === "Alugado") msgBloqueio = `<p class="card-indisponivel-msg">Veículo alugado</p>`;
-    if (status === "Em manutenção") msgBloqueio = `<p class="card-indisponivel-msg">Em manutenção</p>`;
-
-    const btnHtml = disponivel
-        ? `<button class="btn-selecionar" onclick="selecionarVeiculo(${idx})">Selecionar</button>`
-        : `<button class="btn-bloqueado" disabled>Indisponível</button>`;
-
-    card.innerHTML = `
-        <div class="card-img-wrapper">
-            <img src="${veiculo.img || ""}" alt="${veiculo.nome || "Veículo"}">
-            <span class="status-badge ${getBadgeClass(status)}">${status}</span>
-        </div>
-        <h3>${veiculo.nome || "—"}</h3>
-        <p class="card-marca">${veiculo.marca || "—"}${veiculo.ano ? " · " + veiculo.ano : ""}</p>
-        <p class="card-placa">${veiculo.placa || "—"}</p>
-        <p class="card-preco">${preco}</p>
-        ${msgBloqueio}
-        ${btnHtml}
-    `;
-
-    dom.containerVeiculos.appendChild(card);
 }
 
 /*
@@ -396,7 +541,6 @@ function selecionarVeiculo(index) {
 }
 
 function mostrarPainelAlocacao(v) {
-    // Preenche detalhes do veículo
     document.getElementById("det-img").src = v.img || "";
     document.getElementById("det-img").alt = v.nome || "Veículo";
     document.getElementById("det-marca").textContent = v.marca || "—";
@@ -419,34 +563,31 @@ function mostrarPainelAlocacao(v) {
     document.getElementById("alocacao-veiculo-titulo").textContent =
         `${v.marca || ""} ${v.nome || ""} — ${v.placa || ""}`.trim();
 
-    // Preenche KM mínimo de saída
     const kmInput = document.getElementById("alocar-km-saida");
     kmInput.value = v.km_atual || "";
     kmInput.min = v.km_atual || 0;
 
-    // Data mínima de saída = hoje
     const hoje = new Date().toISOString().split("T")[0];
     document.getElementById("alocar-data-saida").min = hoje;
     document.getElementById("alocar-data-retorno").min = hoje;
 
-    // Popula selects
     popularSelectClientes();
     popularSelectFuncionarios();
-    // popularSelectEstados();
 
-    // Limpa e calcula resumo inicial
     limparFormAlocacao();
     calcularResumo();
 
-    // Exibe painel de formulário, oculta grade
     document.getElementById("alocacao-selecao").style.display = "none";
+    document.getElementById("alocacao-finalizar-wrapper").style.display = "none";
     document.getElementById("alocacao-form-wrapper").style.display = "block";
 }
 
 function voltarParaVeiculos() {
     const wrapper = document.getElementById("alocacao-form-wrapper");
+    const finalizar = document.getElementById("alocacao-finalizar-wrapper");
     const selecao = document.getElementById("alocacao-selecao");
     if (wrapper) wrapper.style.display = "none";
+    if (finalizar) finalizar.style.display = "none";
     if (selecao) selecao.style.display = "block";
     indexVeiculoSelecionado = null;
 }
@@ -477,38 +618,8 @@ function popularSelectFuncionarios() {
     });
 }
 
-// function popularSelectEstados() {                                     Retirar
-//     const sel = document.getElementById("alocar-estado");
-//     sel.innerHTML = '<option value="">Selecione o estado</option>';
-//     Object.keys(estadosCidades).sort().forEach(uf => {
-//         const opt = document.createElement("option");
-//         opt.value       = uf;
-//         opt.textContent = uf;
-//         sel.appendChild(opt);
-//     });
-// }
-
-// function carregarCidades() {                                           Retirar
-//     const uf       = document.getElementById("alocar-estado").value;
-//     const selCidade = document.getElementById("alocar-cidade");
-//     selCidade.innerHTML = '<option value="">Selecione a cidade</option>';
-
-//     if (!uf || !estadosCidades[uf]) {
-//         selCidade.disabled = true;
-//         return;
-//     }
-
-//     estadosCidades[uf].forEach(cidade => {
-//         const opt = document.createElement("option");
-//         opt.value       = cidade;
-//         opt.textContent = cidade;
-//         selCidade.appendChild(opt);
-//     });
-//     selCidade.disabled = false;
-// }
-
 /*
-    CÁLCULO DO RESUMO
+    CÁLCULO DO RESUMO (nova alocação)
 */
 
 function calcularResumo() {
@@ -524,7 +635,6 @@ function calcularResumo() {
         : "—";
 
     if (dataSaida && dataRetorno) {
-        // Datas no formato YYYY-MM-DD — parse sem fuso horário
         const [y1, m1, d1] = dataSaida.split("-").map(Number);
         const [y2, m2, d2] = dataRetorno.split("-").map(Number);
         const ts1 = new Date(y1, m1 - 1, d1);
@@ -549,15 +659,12 @@ function calcularResumo() {
 }
 
 /*
-    VALIDAÇÃO DO FORMULÁRIO
+    VALIDAÇÃO DO FORMULÁRIO DE ALOCAÇÃO
 */
 
 function limparFormAlocacao() {
     const form = document.getElementById("form-alocacao");
     if (form) form.reset();
-
-    const cidade = document.getElementById("alocar-cidade");
-    if (cidade) cidade.disabled = true;
 
     document.querySelectorAll("#form-alocacao .campo-erro").forEach(el => { el.textContent = ""; });
     document.querySelectorAll("#form-alocacao .campo-invalido").forEach(el => { el.classList.remove("campo-invalido"); });
@@ -575,15 +682,10 @@ function validarFormAlocacao() {
         { id: "alocar-data-saida", erroId: "erro-data-saida", msg: "Informe a data de saída." },
         { id: "alocar-data-retorno", erroId: "erro-data-retorno", msg: "Informe a data de retorno prevista." },
         { id: "alocar-km-saida", erroId: "erro-km-saida", msg: "Informe a quilometragem de saída." },
-        // { id: "alocar-estado", erroId: "erro-estado", msg: "Selecione o estado." },
-        // { id: "alocar-cidade", erroId: "erro-cidade", msg: "Selecione a cidade." },
-        // { id: "alocar-logradouro", erroId: "erro-logradouro", msg: "Informe o logradouro." },
-        // { id: "alocar-numero", erroId: "erro-numero", msg: "Informe o número." },
         { id: "alocar-status", erroId: "erro-status", msg: "Selecione o status da locação." },
         { id: "alocar-pagamento", erroId: "erro-pagamento", msg: "Selecione a forma de pagamento." },
     ];
 
-    // Limpa erros anteriores
     campos.forEach(c => {
         const el = document.getElementById(c.id);
         const erro = document.getElementById(c.erroId);
@@ -591,7 +693,6 @@ function validarFormAlocacao() {
         if (erro) erro.textContent = "";
     });
 
-    // Campos obrigatórios
     campos.forEach(c => {
         const el = document.getElementById(c.id);
         if (!el || !el.value.trim()) {
@@ -602,7 +703,6 @@ function validarFormAlocacao() {
         }
     });
 
-    // Validação de datas
     const dataSaida = document.getElementById("alocar-data-saida").value;
     const dataRetorno = document.getElementById("alocar-data-retorno").value;
     const hoje = new Date().toISOString().split("T")[0];
@@ -619,7 +719,6 @@ function validarFormAlocacao() {
         valido = false;
     }
 
-    // Validação de KM
     const v = veiculos[indexVeiculoSelecionado];
     const kmVal = parseInt(document.getElementById("alocar-km-saida").value, 10);
     if (v && v.km_atual != null && !isNaN(kmVal) && kmVal < v.km_atual) {
@@ -641,15 +740,34 @@ function confirmarAlocacao(event) {
 
     if (!validarFormAlocacao()) {
         mostrarNotificacao("Corrija os campos indicados antes de continuar.", "erro");
-        // Scroll para o topo do formulário
         document.getElementById("notif-alocacao").scrollIntoView({ behavior: "smooth", block: "nearest" });
         return;
     }
 
     const v = veiculos[indexVeiculoSelecionado];
-    const clienteSel = clientes[document.getElementById("alocar-cliente").value];
+    const idxCliente = parseInt(document.getElementById("alocar-cliente").value, 10);
+    const idxFuncionario = parseInt(document.getElementById("alocar-funcionario").value, 10);
+    const clienteSel = clientes[idxCliente];
+    const dataSaida = document.getElementById("alocar-data-saida").value;
+    const dataRetorno = document.getElementById("alocar-data-retorno").value;
+    const kmSaida = parseInt(document.getElementById("alocar-km-saida").value, 10);
+    const status = document.getElementById("alocar-status").value;
+    const pagamento = document.getElementById("alocar-pagamento").value;
+    const entrada = parseFloat(document.getElementById("alocar-entrada").value) || 0;
 
-    // Atualiza o veículo (futuramente: via API)
+    locacoes.push({
+        id: locacoes.length + 1,
+        idx_veiculo: indexVeiculoSelecionado,
+        idx_cliente: idxCliente,
+        idx_funcionario: idxFuncionario,
+        data_saida: dataSaida,
+        data_retorno_prevista: dataRetorno,
+        km_saida: kmSaida,
+        status: status,
+        forma_pagamento: pagamento,
+        valor_entrada: entrada
+    });
+
     v.status = "Alugado";
     v.cliente = clienteSel;
 
@@ -678,6 +796,182 @@ function mostrarNotificacao(msg, tipo) {
     if (tipo === "sucesso") {
         setTimeout(() => { notif.style.display = "none"; }, 3000);
     }
+}
+
+function mostrarNotificacaoFinalizar(msg, tipo) {
+    const notif = document.getElementById("notif-finalizar");
+    if (!notif) return;
+    notif.textContent = msg;
+    notif.className = `notif ${tipo}`;
+    notif.style.display = "block";
+
+    if (tipo === "sucesso") {
+        setTimeout(() => { notif.style.display = "none"; }, 3000);
+    }
+}
+
+/*
+    FINALIZAÇÃO DE LOCAÇÃO
+*/
+
+function abrirFormFinalizacao(idxVeiculo) {
+    const v = veiculos[idxVeiculo];
+    const locacao = locacoes.find(l => l.idx_veiculo === idxVeiculo);
+
+    if (!locacao) {
+        alert("Nenhuma locação ativa encontrada para este veículo.");
+        return;
+    }
+
+    indexVeiculoSelecionado = idxVeiculo;
+
+    document.getElementById("fin-img").src = v.img || "";
+    document.getElementById("fin-img").alt = v.nome || "";
+    document.getElementById("fin-marca").textContent = v.marca || "—";
+    document.getElementById("fin-modelo").textContent = v.nome || "—";
+    document.getElementById("fin-placa").textContent = v.placa || "—";
+    document.getElementById("fin-cliente").textContent = clientes[locacao.idx_cliente]?.nome || "—";
+    document.getElementById("fin-data-saida").textContent = formatarData(locacao.data_saida);
+    document.getElementById("fin-data-retorno-prev").textContent = formatarData(locacao.data_retorno_prevista);
+    document.getElementById("fin-km-saida").textContent = locacao.km_saida.toLocaleString("pt-BR") + " km";
+    document.getElementById("fin-status").textContent = locacao.status;
+    document.getElementById("fin-valor-diario").textContent = "R$ " + formatarMoeda(v.valor_diario || 0);
+    document.getElementById("finalizar-veiculo-titulo").textContent =
+        `${v.marca || ""} ${v.nome || ""} — ${v.placa || ""}`.trim();
+
+    const dataRetornInput = document.getElementById("fin-data-retorno-real");
+    dataRetornInput.min = locacao.data_saida;
+    dataRetornInput.value = "";
+
+    const kmInput = document.getElementById("fin-km-retorno");
+    kmInput.min = locacao.km_saida;
+    kmInput.value = "";
+
+    document.getElementById("form-finalizar").reset();
+    document.getElementById("notif-finalizar").style.display = "none";
+    document.getElementById("fin-res-atraso-linha").style.display = "none";
+    document.getElementById("fin-res-extra-linha").style.display = "none";
+    ["fin-res-periodo", "fin-res-dias", "fin-res-base", "fin-res-total"].forEach(id => {
+        document.getElementById(id).textContent = "—";
+    });
+
+    document.getElementById("alocacao-selecao").style.display = "none";
+    document.getElementById("alocacao-form-wrapper").style.display = "none";
+    document.getElementById("alocacao-finalizar-wrapper").style.display = "block";
+}
+
+function calcularCustoFinalizacao() {
+    const v = indexVeiculoSelecionado !== null ? veiculos[indexVeiculoSelecionado] : null;
+    const locacao = v ? locacoes.find(l => l.idx_veiculo === indexVeiculoSelecionado) : null;
+    if (!v || !locacao) return;
+
+    const dataRetornoReal = document.getElementById("fin-data-retorno-real").value;
+    const custoAdicional = parseFloat(document.getElementById("fin-custo-adicional").value) || 0;
+
+    if (!dataRetornoReal) {
+        ["fin-res-periodo", "fin-res-dias", "fin-res-base", "fin-res-total"].forEach(id => {
+            document.getElementById(id).textContent = "—";
+        });
+        document.getElementById("fin-res-atraso-linha").style.display = "none";
+        document.getElementById("fin-res-extra-linha").style.display = "none";
+        return;
+    }
+
+    const [y1, m1, d1] = locacao.data_saida.split("-").map(Number);
+    const [y2, m2, d2] = dataRetornoReal.split("-").map(Number);
+    const tsInicio = new Date(y1, m1 - 1, d1);
+    const tsFim = new Date(y2, m2 - 1, d2);
+    const dias = Math.ceil((tsFim - tsInicio) / (1000 * 60 * 60 * 24));
+
+    if (dias <= 0) {
+        document.getElementById("fin-res-periodo").textContent = "Data inválida";
+        ["fin-res-dias", "fin-res-base", "fin-res-total"].forEach(id => {
+            document.getElementById(id).textContent = "—";
+        });
+        return;
+    }
+
+    const valorDiario = v.valor_diario || 0;
+    const valorBase = dias * valorDiario;
+
+    const [y3, m3, d3] = locacao.data_retorno_prevista.split("-").map(Number);
+    const tsPrevisto = new Date(y3, m3 - 1, d3);
+    const diasAtraso = Math.max(0, Math.ceil((tsFim - tsPrevisto) / (1000 * 60 * 60 * 24)));
+    const multa = diasAtraso > 0 ? diasAtraso * valorDiario * 0.5 : 0;
+
+    const total = valorBase + multa + custoAdicional;
+
+    document.getElementById("fin-res-periodo").textContent = `${formatarData(locacao.data_saida)} → ${formatarData(dataRetornoReal)}`;
+    document.getElementById("fin-res-dias").textContent = `${dias} dia${dias > 1 ? "s" : ""}`;
+    document.getElementById("fin-res-base").textContent = "R$ " + formatarMoeda(valorBase);
+
+    if (diasAtraso > 0) {
+        document.getElementById("fin-res-atraso-linha").style.display = "flex";
+        document.getElementById("fin-res-multa").textContent = `R$ ${formatarMoeda(multa)} (${diasAtraso} dia${diasAtraso > 1 ? "s" : ""} de atraso)`;
+    } else {
+        document.getElementById("fin-res-atraso-linha").style.display = "none";
+    }
+
+    if (custoAdicional > 0) {
+        document.getElementById("fin-res-extra-linha").style.display = "flex";
+        document.getElementById("fin-res-extra").textContent = "R$ " + formatarMoeda(custoAdicional);
+    } else {
+        document.getElementById("fin-res-extra-linha").style.display = "none";
+    }
+
+    document.getElementById("fin-res-total").textContent = "R$ " + formatarMoeda(total);
+}
+
+function confirmarFinalizacao(event) {
+    event.preventDefault();
+
+    const v = veiculos[indexVeiculoSelecionado];
+    const locacao = locacoes.find(l => l.idx_veiculo === indexVeiculoSelecionado);
+
+    const kmRetorno = document.getElementById("fin-km-retorno").value;
+    const dataRetornoReal = document.getElementById("fin-data-retorno-real").value;
+    let valido = true;
+
+    document.getElementById("fin-km-retorno").classList.remove("campo-invalido");
+    document.getElementById("erro-fin-km").textContent = "";
+    document.getElementById("fin-data-retorno-real").classList.remove("campo-invalido");
+    document.getElementById("erro-fin-data").textContent = "";
+
+    if (!kmRetorno) {
+        document.getElementById("fin-km-retorno").classList.add("campo-invalido");
+        document.getElementById("erro-fin-km").textContent = "Informe o KM de retorno.";
+        valido = false;
+    }
+
+    if (!dataRetornoReal) {
+        document.getElementById("fin-data-retorno-real").classList.add("campo-invalido");
+        document.getElementById("erro-fin-data").textContent = "Informe a data de retorno real.";
+        valido = false;
+    }
+
+    if (!valido) return;
+
+    const kmVal = parseInt(kmRetorno, 10);
+    if (locacao && kmVal < locacao.km_saida) {
+        document.getElementById("fin-km-retorno").classList.add("campo-invalido");
+        document.getElementById("erro-fin-km").textContent =
+            `KM de retorno deve ser ≥ KM de saída (${locacao.km_saida.toLocaleString("pt-BR")} km).`;
+        return;
+    }
+
+    v.status = "Disponível";
+    v.cliente = null;
+    v.km_atual = kmVal;
+
+    const locIdx = locacoes.findIndex(l => l.idx_veiculo === indexVeiculoSelecionado);
+    if (locIdx !== -1) locacoes.splice(locIdx, 1);
+
+    mostrarNotificacaoFinalizar(`Locação do ${v.marca} ${v.nome} finalizada com sucesso!`, "sucesso");
+
+    setTimeout(() => {
+        render();
+        voltarParaVeiculos();
+    }, 1800);
 }
 
 /*
@@ -747,7 +1041,42 @@ function cadastrarCliente() {
 }
 
 /*
-    FORMULÁRIOS DE CADASTRO (Veículos / Clientes)
+    CADASTRO DE FUNCIONÁRIOS
+*/
+
+function cadastrarFuncionario() {
+    const nome = document.getElementById("input-nome-funcionario").value.trim();
+    const cpf = document.getElementById("input-cpf-funcionario").value.trim();
+    const nascimento = document.getElementById("input-nascimento-funcionario").value;
+    const sexo = document.getElementById("input-sexo-funcionario").value;
+    const email = document.getElementById("input-email-funcionario").value.trim();
+    const telefone = document.getElementById("input-telefone1-funcionario").value.trim();
+    const cargo = document.getElementById("input-cargo-funcionario").value.trim();
+    const salario = document.getElementById("input-salario-funcionario").value;
+    const admissao = document.getElementById("input-admissao-funcionario").value;
+
+    if (!nome || !cpf || !cargo) return;
+
+    funcionarios.push({
+        id: funcionarios.length + 1,
+        nome, cpf, nascimento, sexo, email, telefone, cargo,
+        salario: salario ? parseFloat(salario) : null,
+        admissao
+    });
+
+    dom.formFuncionarios.reset();
+    fecharFormularioFuncionario();
+    renderTabelaFuncionarios();
+}
+
+function deletarFuncionario(idx) {
+    if (!confirm(`Tem certeza que deseja excluir o funcionário "${funcionarios[idx]?.nome}"?`)) return;
+    funcionarios.splice(idx, 1);
+    renderTabelaFuncionarios();
+}
+
+/*
+    FORMULÁRIOS DE CADASTRO (Veículos / Clientes / Funcionários)
 */
 
 function alternarFormulario(form, tabela) {
@@ -777,6 +1106,14 @@ function fecharFormularioCliente() {
     fecharFormulario(dom.formClientes, dom.tabelaClientes);
 }
 
+function alternarFormularioFuncionario() {
+    if (dom.formFuncionarios) alternarFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
+}
+
+function fecharFormularioFuncionario() {
+    fecharFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
+}
+
 /*
     UTILITÁRIOS
 */
@@ -789,6 +1126,7 @@ function formatarMoeda(valor) {
 }
 
 function formatarData(iso) {
+    if (!iso) return "—";
     const [y, m, d] = iso.split("-");
     return `${d}/${m}/${y}`;
 }

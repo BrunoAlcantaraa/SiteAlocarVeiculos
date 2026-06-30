@@ -20,11 +20,13 @@
             <form id="form-login" onsubmit="fazerLogin(event)">
                 <div class="login-field">
                     <label for="input-login-usuario">Usuário</label>
-                    <input type="text" id="input-login-usuario" placeholder="Digite seu usuário" autocomplete="username">
+                    <input type="text" id="input-login-usuario" placeholder="Digite seu usuário"
+                        autocomplete="username">
                 </div>
                 <div class="login-field">
                     <label for="input-login-senha">Senha</label>
-                    <input type="password" id="input-login-senha" placeholder="Digite sua senha" autocomplete="current-password">
+                    <input type="password" id="input-login-senha" placeholder="Digite sua senha"
+                        autocomplete="current-password">
                 </div>
                 <p id="login-erro"></p>
                 <button type="submit" id="btn-entrar">Entrar</button>
@@ -49,6 +51,10 @@
                     onclick="mostrarPagina('pag-cadastro-veiculos')">Veículos</a>
                 <a href="#" class="nav-item" data-page="pag-cadastro-clientes"
                     onclick="mostrarPagina('pag-cadastro-clientes')">Clientes</a>
+                <a href="#" class="nav-item" data-page="pag-cadastro-funcionarios"
+                    onclick="mostrarPagina('pag-cadastro-funcionarios')">Funcionários</a>
+                <div class="nav-separator"></div>
+                <button class="nav-item nav-logout" onclick="fazerLogout()">Sair</button>
             </nav>
         </aside>
 
@@ -97,10 +103,36 @@
                     <!-- Estado 1: Grade de veículos -->
                     <div id="alocacao-selecao">
                         <div class="search-bar">
-                            <input type="text" id="busca-alocacao" placeholder="Buscar por modelo, marca ou placa..." oninput="filtrarVeiculosAlocacao(this.value)">
+                            <input type="text" id="busca-alocacao" placeholder="Buscar por modelo, marca ou placa..."
+                                oninput="filtrarVeiculosAlocacao(this.value)">
                         </div>
-                        <div id="container-veiculos"></div>
-                        <p id="msg-sem-veiculos">Nenhum veículo encontrado.</p>
+
+                        <div class="alocacao-toggle" role="tablist" aria-label="Visualização de alocação">
+                            <button type="button" class="alocacao-toggle-btn active"
+                                data-view="disponiveis"
+                                onclick="alternarVisaoAlocacao('disponiveis')">Disponíveis</button>
+                            <button type="button" class="alocacao-toggle-btn"
+                                data-view="reservados"
+                                onclick="alternarVisaoAlocacao('reservados')">Reservados / Em uso</button>
+                        </div>
+
+                        <div id="alocacao-view-disponiveis" class="alocacao-view-panel active">
+                            <div class="alocacao-subsecao">
+                                <h3 class="subsecao-titulo">Disponíveis</h3>
+                                <div id="alocacao-disponiveis" class="cards-alocacao-grid"></div>
+                                <p id="msg-sem-disponiveis" class="msg-vazia" style="display:none">Nenhum veículo disponível
+                                    no momento.</p>
+                            </div>
+                        </div>
+
+                        <div id="alocacao-view-reservados" class="alocacao-view-panel">
+                            <div class="alocacao-subsecao">
+                                <h3 class="subsecao-titulo">Reservados / Em uso</h3>
+                                <div id="alocacao-reservados" class="cards-alocacao-grid"></div>
+                                <p id="msg-sem-reservados" class="msg-vazia" style="display:none">Nenhum veículo reservado
+                                    no momento.</p>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Estado 2: Formulário de alocação -->
@@ -163,14 +195,16 @@
                                     <div class="form-section">
                                         <h4>Cliente e Responsável</h4>
                                         <div class="form-field">
-                                            <label for="alocar-cliente">Cliente <span class="obrigatorio">*</span></label>
+                                            <label for="alocar-cliente">Cliente <span
+                                                    class="obrigatorio">*</span></label>
                                             <select id="alocar-cliente">
                                                 <option value="">Selecione o cliente</option>
                                             </select>
                                             <span class="campo-erro" id="erro-cliente"></span>
                                         </div>
                                         <div class="form-field">
-                                            <label for="alocar-funcionario">Funcionário Responsável <span class="obrigatorio">*</span></label>
+                                            <label for="alocar-funcionario">Funcionário Responsável <span
+                                                    class="obrigatorio">*</span></label>
                                             <select id="alocar-funcionario">
                                                 <option value="">Selecione o funcionário</option>
                                             </select>
@@ -183,12 +217,14 @@
                                         <h4>Período da Locação</h4>
                                         <div class="form-row-2">
                                             <div class="form-field">
-                                                <label for="alocar-data-saida">Data de Saída <span class="obrigatorio">*</span></label>
+                                                <label for="alocar-data-saida">Data de Saída <span
+                                                        class="obrigatorio">*</span></label>
                                                 <input type="date" id="alocar-data-saida" oninput="calcularResumo()">
                                                 <span class="campo-erro" id="erro-data-saida"></span>
                                             </div>
                                             <div class="form-field">
-                                                <label for="alocar-data-retorno">Data de Retorno Prevista <span class="obrigatorio">*</span></label>
+                                                <label for="alocar-data-retorno">Data de Retorno Prevista <span
+                                                        class="obrigatorio">*</span></label>
                                                 <input type="date" id="alocar-data-retorno" oninput="calcularResumo()">
                                                 <span class="campo-erro" id="erro-data-retorno"></span>
                                             </div>
@@ -199,7 +235,8 @@
                                     <div class="form-section">
                                         <h4>Quilometragem</h4>
                                         <div class="form-field">
-                                            <label for="alocar-km-saida">KM de Saída <span class="obrigatorio">*</span></label>
+                                            <label for="alocar-km-saida">KM de Saída <span
+                                                    class="obrigatorio">*</span></label>
                                             <input type="number" id="alocar-km-saida" placeholder="Ex: 45000" min="0">
                                             <span class="campo-erro" id="erro-km-saida"></span>
                                         </div>
@@ -209,7 +246,8 @@
                                     <div class="form-section">
                                         <h4>Detalhes da Locação</h4>
                                         <div class="form-field">
-                                            <label for="alocar-status">Status da Locação <span class="obrigatorio">*</span></label>
+                                            <label for="alocar-status">Status da Locação <span
+                                                    class="obrigatorio">*</span></label>
                                             <select id="alocar-status">
                                                 <option value="">Selecione o status</option>
                                                 <option value="Reservado">Reservado</option>
@@ -225,7 +263,8 @@
                                     <div class="form-section">
                                         <h4>Pagamento</h4>
                                         <div class="form-field">
-                                            <label for="alocar-pagamento">Forma de Pagamento <span class="obrigatorio">*</span></label>
+                                            <label for="alocar-pagamento">Forma de Pagamento <span
+                                                    class="obrigatorio">*</span></label>
                                             <select id="alocar-pagamento">
                                                 <option value="">Selecione a forma de pagamento</option>
                                                 <option value="Dinheiro">Dinheiro</option>
@@ -238,7 +277,8 @@
                                         </div>
                                         <div class="form-field">
                                             <label for="alocar-entrada">Valor de Entrada (R$)</label>
-                                            <input type="number" id="alocar-entrada" placeholder="0,00" min="0" step="0.01">
+                                            <input type="number" id="alocar-entrada" placeholder="0,00" min="0"
+                                                step="0.01">
                                         </div>
                                     </div>
 
@@ -268,8 +308,151 @@
                                     </div>
 
                                     <div class="form-actions">
-                                        <button type="button" class="btn-cancelar" onclick="voltarParaVeiculos()">Cancelar</button>
+                                        <button type="button" class="btn-cancelar"
+                                            onclick="voltarParaVeiculos()">Cancelar</button>
                                         <button type="submit" class="btn-confirmar">Confirmar Alocação</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Estado 3: Formulário de finalização -->
+                    <div id="alocacao-finalizar-wrapper" style="display:none">
+                        <div class="alocacao-form-header">
+                            <button class="btn-voltar" type="button" onclick="voltarParaVeiculos()">← Voltar</button>
+                            <span id="finalizar-veiculo-titulo"></span>
+                        </div>
+
+                        <div class="alocacao-layout">
+                            <!-- Painel esquerdo: info do veículo -->
+                            <div class="veiculo-detalhe-card">
+                                <div class="det-img-wrapper">
+                                    <img id="fin-img" src="" alt="">
+                                </div>
+                                <div class="det-info-grid">
+                                    <div class="det-item">
+                                        <span class="det-label">Marca</span>
+                                        <span class="det-valor" id="fin-marca">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Modelo</span>
+                                        <span class="det-valor" id="fin-modelo">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Placa</span>
+                                        <span class="det-valor" id="fin-placa">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Cliente</span>
+                                        <span class="det-valor" id="fin-cliente">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Data Saída</span>
+                                        <span class="det-valor" id="fin-data-saida">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Retorno Previsto</span>
+                                        <span class="det-valor" id="fin-data-retorno-prev">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">KM Saída</span>
+                                        <span class="det-valor" id="fin-km-saida">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Status</span>
+                                        <span class="det-valor" id="fin-status">—</span>
+                                    </div>
+                                    <div class="det-item det-item-full det-preco-wrapper">
+                                        <span class="det-label">Valor Diário</span>
+                                        <span class="det-preco" id="fin-valor-diario">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Painel direito: formulário de finalização -->
+                            <div class="alocacao-form-campos">
+                                <div id="notif-finalizar" class="notif" style="display:none"></div>
+                                <form id="form-finalizar" onsubmit="confirmarFinalizacao(event)" novalidate>
+
+                                    <div class="form-section">
+                                        <h4>Retorno do Veículo</h4>
+                                        <div class="form-row-2">
+                                            <div class="form-field">
+                                                <label for="fin-km-retorno">KM de Retorno <span
+                                                        class="obrigatorio">*</span></label>
+                                                <input type="number" id="fin-km-retorno" placeholder="Ex: 47000" min="0"
+                                                    oninput="calcularCustoFinalizacao()">
+                                                <span class="campo-erro" id="erro-fin-km"></span>
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="fin-data-retorno-real">Data de Retorno Real <span
+                                                        class="obrigatorio">*</span></label>
+                                                <input type="date" id="fin-data-retorno-real"
+                                                    oninput="calcularCustoFinalizacao()">
+                                                <span class="campo-erro" id="erro-fin-data"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section">
+                                        <h4>Observações</h4>
+                                        <div class="form-field">
+                                            <label for="fin-observacoes">Danos / Observações</label>
+                                            <textarea id="fin-observacoes" rows="3"
+                                                placeholder="Descreva danos ou observações relevantes..."></textarea>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-section">
+                                        <h4>Custos Adicionais</h4>
+                                        <div class="form-row-2">
+                                            <div class="form-field">
+                                                <label for="fin-custo-adicional">Custo Adicional (R$)</label>
+                                                <input type="number" id="fin-custo-adicional" placeholder="0,00" min="0"
+                                                    step="0.01" oninput="calcularCustoFinalizacao()">
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="fin-descricao-custo">Descrição do Custo</label>
+                                                <input type="text" id="fin-descricao-custo"
+                                                    placeholder="Ex: Avaria no para-choque">
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="resumo-locacao">
+                                        <h4>Resumo do Fechamento</h4>
+                                        <div class="resumo-linha">
+                                            <span>Período</span>
+                                            <span id="fin-res-periodo">—</span>
+                                        </div>
+                                        <div class="resumo-linha">
+                                            <span>Dias de locação</span>
+                                            <span id="fin-res-dias">—</span>
+                                        </div>
+                                        <div class="resumo-linha">
+                                            <span>Valor base</span>
+                                            <span id="fin-res-base">—</span>
+                                        </div>
+                                        <div class="resumo-linha" id="fin-res-atraso-linha" style="display:none">
+                                            <span>Multa por atraso</span>
+                                            <span id="fin-res-multa" style="color:#e74c3c">—</span>
+                                        </div>
+                                        <div class="resumo-linha" id="fin-res-extra-linha" style="display:none">
+                                            <span>Custo adicional</span>
+                                            <span id="fin-res-extra">—</span>
+                                        </div>
+                                        <div class="resumo-linha resumo-total">
+                                            <span>Total</span>
+                                            <span id="fin-res-total">—</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-cancelar"
+                                            onclick="voltarParaVeiculos()">Cancelar</button>
+                                        <button type="submit" class="btn-confirmar btn-finalizar">Finalizar
+                                            Locação</button>
                                     </div>
                                 </form>
                             </div>
@@ -283,7 +466,9 @@
                     <!-- Tabela Veículos -->
                     <div class="table-section" id="tabela-veiculos">
                         <div class="search-bar">
-                            <input type="text" id="busca-veiculos" placeholder="Buscar por modelo, marca, placa ou status..." oninput="filtrarTabelaVeiculos(this.value)">
+                            <input type="text" id="busca-veiculos"
+                                placeholder="Buscar por modelo, marca, placa ou status..."
+                                oninput="filtrarTabelaVeiculos(this.value)">
                         </div>
                         <table class="data-table">
                             <thead>
@@ -308,7 +493,8 @@
                                 <input type="text" id="input-modelo-veiculo" placeholder="Modelo">
                             </div>
                             <div class="form-row">
-                                <input type="number" id="input-ano-veiculo" placeholder="Ano de Fabricação" min="1900" max="2030">
+                                <input type="number" id="input-ano-veiculo" placeholder="Ano de Fabricação" min="1900"
+                                    max="2030">
                                 <input type="text" id="input-placa-veiculo" placeholder="Placa (ABC-1234)">
                             </div>
                             <input type="text" id="input-renavam-veiculo" placeholder="RENAVAM">
@@ -331,7 +517,8 @@
                                     <option value="Elétrico">Elétrico</option>
                                     <option value="Híbrido">Híbrido</option>
                                 </select>
-                                <input type="number" id="input-valor-diario-veiculo" placeholder="Valor Diário (R$)" min="0" step="0.01">
+                                <input type="number" id="input-valor-diario-veiculo" placeholder="Valor Diário (R$)"
+                                    min="0" step="0.01">
                             </div>
                             <select id="input-status-veiculo">
                                 <option value="" disabled selected>Status</option>
@@ -343,7 +530,8 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancelar" onclick="fecharFormularioVeiculo()">Cancelar</button>
+                            <button type="button" class="btn-cancelar"
+                                onclick="fecharFormularioVeiculo()">Cancelar</button>
                             <button type="button" onclick="cadastrarVeiculo()">Cadastrar Veículo</button>
                         </div>
                     </form>
@@ -355,7 +543,8 @@
                     <!-- Tabela Clientes -->
                     <div class="table-section" id="tabela-clientes">
                         <div class="search-bar">
-                            <input type="text" id="busca-clientes" placeholder="Buscar por nome, CPF ou e-mail..." oninput="filtrarTabelaClientes(this.value)">
+                            <input type="text" id="busca-clientes" placeholder="Buscar por nome, CPF ou e-mail..."
+                                oninput="filtrarTabelaClientes(this.value)">
                         </div>
                         <table class="data-table">
                             <thead>
@@ -408,8 +597,93 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancelar" onclick="fecharFormularioCliente()">Cancelar</button>
+                            <button type="button" class="btn-cancelar"
+                                onclick="fecharFormularioCliente()">Cancelar</button>
                             <button type="button" onclick="cadastrarCliente()">Cadastrar Cliente</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Aba Funcionários -->
+                <div id="pag-cadastro-funcionarios" class="pag-cadastro">
+
+                    <div class="table-section" id="tabela-funcionarios">
+                        <div class="search-bar">
+                            <input type="text" id="busca-funcionarios" placeholder="Buscar por nome, CPF ou cargo..."
+                                oninput="filtrarTabelaFuncionarios(this.value)">
+                        </div>
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nome</th>
+                                    <th>CPF</th>
+                                    <th>Email</th>
+                                    <th>Telefone</th>
+                                    <th>Cargo</th>
+                                    <th>Salário</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbody-funcionarios"></tbody>
+                        </table>
+                    </div>
+
+                    <form id="form-cadastrar-funcionario" class="form-cadastrar" style="display: none;">
+                        <div class="form-section">
+                            <h4>Dados Pessoais</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-nome-funcionario" placeholder="Nome completo">
+                                <input type="text" id="input-cpf-funcionario" placeholder="CPF (000.000.000-00)">
+                            </div>
+                            <div class="form-row">
+                                <input type="date" id="input-nascimento-funcionario" title="Data de Nascimento">
+                                <select id="input-sexo-funcionario">
+                                    <option value="" disabled selected>Sexo</option>
+                                    <option value="M">Masculino</option>
+                                    <option value="F">Feminino</option>
+                                </select>
+                            </div>
+                            <input type="email" id="input-email-funcionario" placeholder="E-mail">
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Contato</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-telefone1-funcionario" placeholder="Telefone 1">
+                                <input type="text" id="input-telefone2-funcionario" placeholder="Telefone 2 (opcional)">
+                            </div>
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Endereço</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-cep-funcionario" placeholder="CEP">
+                                <input type="text" id="input-estado-funcionario" placeholder="Estado (UF)"
+                                    maxlength="2">
+                            </div>
+                            <input type="text" id="input-cidade-funcionario" placeholder="Cidade">
+                            <input type="text" id="input-bairro-funcionario" placeholder="Bairro">
+                            <div class="form-row">
+                                <input type="text" id="input-rua-funcionario" placeholder="Rua">
+                                <input type="text" id="input-numero-end-funcionario" placeholder="Número">
+                            </div>
+                            <input type="text" id="input-complemento-funcionario" placeholder="Complemento (opcional)">
+                        </div>
+
+                        <div class="form-section">
+                            <h4>Dados Profissionais</h4>
+                            <div class="form-row">
+                                <input type="text" id="input-cargo-funcionario" placeholder="Cargo">
+                                <input type="number" id="input-salario-funcionario" placeholder="Salário (R$)" min="0"
+                                    step="0.01">
+                            </div>
+                            <input type="date" id="input-admissao-funcionario" title="Data de Admissão">
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancelar"
+                                onclick="fecharFormularioFuncionario()">Cancelar</button>
+                            <button type="button" onclick="cadastrarFuncionario()">Cadastrar Funcionário</button>
                         </div>
                     </form>
                 </div>
