@@ -10,7 +10,29 @@
 
 <body>
 
-    <div id="layout">
+    <!-- Tela de Login -->
+    <div id="login-screen">
+        <div id="login-card">
+            <div id="login-logo">
+                <h1>Alugue Fácil</h1>
+                <span>Sistema de Alocação</span>
+            </div>
+            <form id="form-login" onsubmit="fazerLogin(event)">
+                <div class="login-field">
+                    <label for="input-login-usuario">Usuário</label>
+                    <input type="text" id="input-login-usuario" placeholder="Digite seu usuário" autocomplete="username">
+                </div>
+                <div class="login-field">
+                    <label for="input-login-senha">Senha</label>
+                    <input type="password" id="input-login-senha" placeholder="Digite sua senha" autocomplete="current-password">
+                </div>
+                <p id="login-erro"></p>
+                <button type="submit" id="btn-entrar">Entrar</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="layout" style="display:none">
 
         <!-- Sidebar -->
         <aside id="sidebar">
@@ -71,6 +93,9 @@
 
                 <!-- Alocação -->
                 <div id="pag-alocacao">
+                    <div class="search-bar">
+                        <input type="text" id="busca-alocacao" placeholder="Buscar por modelo, marca ou placa..." oninput="filtrarVeiculosAlocacao(this.value)">
+                    </div>
                     <div id="container-veiculos"></div>
                     <p id="msg-sem-veiculos">Nenhum veículo disponível para alocação.</p>
 
@@ -91,6 +116,9 @@
 
                     <!-- Tabela Veículos -->
                     <div class="table-section" id="tabela-veiculos">
+                        <div class="search-bar">
+                            <input type="text" id="busca-veiculos" placeholder="Buscar por modelo, marca, placa ou status..." oninput="filtrarTabelaVeiculos(this.value)">
+                        </div>
                         <table class="data-table">
                             <thead>
                                 <tr>
@@ -163,6 +191,9 @@
 
                     <!-- Tabela Clientes -->
                     <div class="table-section" id="tabela-clientes">
+                        <div class="search-bar">
+                            <input type="text" id="busca-clientes" placeholder="Buscar por nome, CPF ou e-mail..." oninput="filtrarTabelaClientes(this.value)">
+                        </div>
                         <table class="data-table">
                             <thead>
                                 <tr>

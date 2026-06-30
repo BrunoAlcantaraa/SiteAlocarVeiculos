@@ -10,6 +10,8 @@ const pages = {
 };
 
 const dom = {
+    loginScreen:         document.getElementById("login-screen"),
+    layout:              document.getElementById("layout"),
     containerVeiculos:   document.getElementById("container-veiculos"),
     msgSemVeiculos:      document.getElementById("msg-sem-veiculos"),
     modalCliente:        document.getElementById("modal-cliente"),
@@ -84,9 +86,33 @@ const actionBarConfig = {
 };
 
 /*
-    INICIO
+    LOGIN
 */
 
+function fazerLogin(event) {
+    event.preventDefault();
+    const usuario = document.getElementById("input-login-usuario").value.trim();
+    const senha   = document.getElementById("input-login-senha").value.trim();
+    const erro    = document.getElementById("login-erro");
+
+    if (!usuario || !senha) {
+        erro.textContent = "Preencha todos os campos.";
+        return;
+    }
+
+    // Futuramente: substituir por chamada à API de autenticação
+    // const autenticado = await api.autenticar({ usuario, senha });
+    // if (!autenticado) { erro.textContent = "Usuário ou senha inválidos."; return; }
+
+    erro.textContent = "";
+    dom.loginScreen.style.display = "none";
+    dom.layout.style.display      = "flex";
+    init();
+}
+
+/*
+    INICIO
+*/
 function init() {
     render();
     mostrarPagina("pag-dashboard");
@@ -97,6 +123,7 @@ function init() {
 */
 
 function render() {
+    limparBuscas();
     renderCardsVeiculos();
     renderOpcoesClientes();
     renderDashboard();
@@ -104,11 +131,18 @@ function render() {
     renderTabelaClientes();
 }
 
-function renderCardsVeiculos() {
+function limparBuscas() {
+    ["busca-alocacao", "busca-veiculos", "busca-clientes"].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.value = "";
+    });
+}
+
+function renderCardsVeiculos(dados) {
+    const lista = dados !== undefined ? dados : veiculos.filter(v => v.cliente === null);
     dom.containerVeiculos.innerHTML = "";
-    const disponiveis = veiculos.filter(v => v.cliente === null);
-    dom.msgSemVeiculos.style.display = disponiveis.length === 0 ? "block" : "none";
-    disponiveis.forEach(v => adicionarCardVeiculo(v));
+    dom.msgSemVeiculos.style.display = lista.length === 0 ? "block" : "none";
+    lista.forEach(v => adicionarCardVeiculo(v));
 }
 
 function renderOpcoesClientes() {
@@ -139,15 +173,16 @@ function renderDashboard() {
         `).join("");
 }
 
-function renderTabelaVeiculos() {
+function renderTabelaVeiculos(dados) {
     if (!dom.tbodyVeiculos) return;
+    const lista = dados !== undefined ? dados : veiculos;
 
-    if (veiculos.length === 0) {
-        dom.tbodyVeiculos.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum Veículo cadastrado.</td></tr>';
+    if (lista.length === 0) {
+        dom.tbodyVeiculos.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum veículo encontrado.</td></tr>';
         return;
     }
 
-    dom.tbodyVeiculos.innerHTML = veiculos.map(v => {
+    dom.tbodyVeiculos.innerHTML = lista.map(v => {
         const statusTexto  = v.cliente ? "Alocado" : (v.status || "Disponível");
         const clienteTexto = v.cliente ? v.cliente.nome : "-";
         return `
@@ -162,15 +197,16 @@ function renderTabelaVeiculos() {
     }).join("");
 }
 
-function renderTabelaClientes() {
+function renderTabelaClientes(dados) {
     if (!dom.tbodyClientes) return;
+    const lista = dados !== undefined ? dados : clientes;
 
-    if (clientes.length === 0) {
-        dom.tbodyClientes.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum Cliente cadastrado.</td></tr>';
+    if (lista.length === 0) {
+        dom.tbodyClientes.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum cliente encontrado.</td></tr>';
         return;
     }
 
-    dom.tbodyClientes.innerHTML = clientes.map(c => `
+    dom.tbodyClientes.innerHTML = lista.map(c => `
         <tr>
             <td>${c.nome     || "-"}</td>
             <td>${c.cpf      || "-"}</td>
@@ -178,6 +214,56 @@ function renderTabelaClientes() {
             <td>${c.telefone || "-"}</td>
         </tr>
     `).join("");
+}
+
+/*
+    BUSCA / FILTRO
+    Para integrar com API: substituir o corpo das funções buscar*
+    por uma chamada fetch() e passar o resultado para o render correspondente.
+*/
+
+function buscarVeiculos(termo) {
+    if (!termo) return veiculos;
+    const t = termo.toLowerCase();
+    return veiculos.filter(v =>
+        (v.nome   || "").toLowerCase().includes(t) ||
+        (v.marca  || "").toLowerCase().includes(t) ||
+        (v.placa  || "").toLowerCase().includes(t) ||
+        (v.status || "").toLowerCase().includes(t)
+    );
+}
+
+function buscarClientes(termo) {
+    if (!termo) return clientes;
+    const t = termo.toLowerCase();
+    return clientes.filter(c =>
+        (c.nome  || "").toLowerCase().includes(t) ||
+        (c.cpf   || "").toLowerCase().includes(t) ||
+        (c.email || "").toLowerCase().includes(t)
+    );
+}
+
+function buscarVeiculosDisponiveis(termo) {
+    const disponiveis = veiculos.filter(v => v.cliente === null);
+    if (!termo) return disponiveis;
+    const t = termo.toLowerCase();
+    return disponiveis.filter(v =>
+        (v.nome  || "").toLowerCase().includes(t) ||
+        (v.marca || "").toLowerCase().includes(t) ||
+        (v.placa || "").toLowerCase().includes(t)
+    );
+}
+
+function filtrarTabelaVeiculos(termo) {
+    renderTabelaVeiculos(buscarVeiculos(termo));
+}
+
+function filtrarTabelaClientes(termo) {
+    renderTabelaClientes(buscarClientes(termo));
+}
+
+function filtrarVeiculosAlocacao(termo) {
+    renderCardsVeiculos(buscarVeiculosDisponiveis(termo));
 }
 
 /*
@@ -302,8 +388,8 @@ function cadastrarCliente() {
     });
 
     dom.formClientes.reset();
-    renderOpcoesClientes();
-    renderDashboard();
+    fecharFormularioCliente();
+    render();
 }
 
 /*
@@ -338,9 +424,3 @@ function alternarFormularioCliente() {
 function fecharFormularioCliente() {
     fecharFormulario(dom.formClientes, dom.tabelaClientes);
 }
-
-/*
-    INÍCIO
-*/
-
-init();
