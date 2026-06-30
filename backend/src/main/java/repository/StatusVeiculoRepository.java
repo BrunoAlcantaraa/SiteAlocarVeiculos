@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StatusVeiculoRepository extends JpaRepository<StatusVeiculo,Long> {
+    StatusVeiculo findByNome(String nome);
 }

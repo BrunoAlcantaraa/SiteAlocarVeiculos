@@ -1,5 +1,6 @@
 package service;
 
+import dto.LocacaoCadastroDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
@@ -13,4 +14,8 @@ public class LocacaoService {
     private final LocacaoRepository locacaoRepository;
     private final StatusLocacaoRepository statusLocacaoRepository;
     private final FuncionarioRepository funcionarioRepository;
+
+    public void Cadastro(LocacaoCadastroDTO dto) {
+
+    }
 }
