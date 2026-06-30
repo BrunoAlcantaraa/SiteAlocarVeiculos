@@ -55,7 +55,7 @@
         <!-- Área Principal -->
         <div id="main">
 
-            <!-- Barra de Ações ex: Cadastrar Veiculo/Cliente -->
+            <!-- Barra de Ações -->
             <div id="action-bar">
                 <h2 id="action-bar-title"></h2>
                 <div id="action-bar-actions"></div>
@@ -93,19 +93,185 @@
 
                 <!-- Alocação -->
                 <div id="pag-alocacao">
-                    <div class="search-bar">
-                        <input type="text" id="busca-alocacao" placeholder="Buscar por modelo, marca ou placa..." oninput="filtrarVeiculosAlocacao(this.value)">
-                    </div>
-                    <div id="container-veiculos"></div>
-                    <p id="msg-sem-veiculos">Nenhum veículo disponível para alocação.</p>
 
-                    <div id="modal-cliente" class="modal">
-                        <div class="modal-conteudo">
-                            <h2>Selecionar Cliente</h2>
-                            <select id="checkbox-cliente-alocar"></select>
-                            <div id="alocar-fechar">
-                                <button onclick="fecharModal()">Cancelar</button>
-                                <button id="btn-alocar" onclick="alocarVeiculo()">Alocar</button>
+                    <!-- Estado 1: Grade de veículos -->
+                    <div id="alocacao-selecao">
+                        <div class="search-bar">
+                            <input type="text" id="busca-alocacao" placeholder="Buscar por modelo, marca ou placa..." oninput="filtrarVeiculosAlocacao(this.value)">
+                        </div>
+                        <div id="container-veiculos"></div>
+                        <p id="msg-sem-veiculos">Nenhum veículo encontrado.</p>
+                    </div>
+
+                    <!-- Estado 2: Formulário de alocação -->
+                    <div id="alocacao-form-wrapper" style="display:none">
+                        <div class="alocacao-form-header">
+                            <button class="btn-voltar" type="button" onclick="voltarParaVeiculos()">← Voltar</button>
+                            <span id="alocacao-veiculo-titulo"></span>
+                        </div>
+
+                        <div class="alocacao-layout">
+
+                            <!-- Painel esquerdo: detalhes do veículo -->
+                            <div class="veiculo-detalhe-card">
+                                <div class="det-img-wrapper">
+                                    <img id="det-img" src="" alt="">
+                                </div>
+                                <span class="det-badge" id="det-status-badge">Disponível</span>
+                                <div class="det-info-grid">
+                                    <div class="det-item">
+                                        <span class="det-label">Marca</span>
+                                        <span class="det-valor" id="det-marca">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Modelo</span>
+                                        <span class="det-valor" id="det-modelo">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Ano</span>
+                                        <span class="det-valor" id="det-ano">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Combustível</span>
+                                        <span class="det-valor" id="det-combustivel">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Placa</span>
+                                        <span class="det-valor" id="det-placa">—</span>
+                                    </div>
+                                    <div class="det-item">
+                                        <span class="det-label">Cor</span>
+                                        <span class="det-valor" id="det-cor">—</span>
+                                    </div>
+                                    <div class="det-item det-item-full">
+                                        <span class="det-label">KM Atual</span>
+                                        <span class="det-valor" id="det-km">—</span>
+                                    </div>
+                                    <div class="det-item det-item-full det-preco-wrapper">
+                                        <span class="det-label">Valor Diário</span>
+                                        <span class="det-preco" id="det-valor-diario">—</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Painel direito: formulário -->
+                            <div class="alocacao-form-campos">
+                                <div id="notif-alocacao" class="notif" style="display:none"></div>
+                                <form id="form-alocacao" onsubmit="confirmarAlocacao(event)" novalidate>
+
+                                    <!-- Cliente e Funcionário -->
+                                    <div class="form-section">
+                                        <h4>Cliente e Responsável</h4>
+                                        <div class="form-field">
+                                            <label for="alocar-cliente">Cliente <span class="obrigatorio">*</span></label>
+                                            <select id="alocar-cliente">
+                                                <option value="">Selecione o cliente</option>
+                                            </select>
+                                            <span class="campo-erro" id="erro-cliente"></span>
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="alocar-funcionario">Funcionário Responsável <span class="obrigatorio">*</span></label>
+                                            <select id="alocar-funcionario">
+                                                <option value="">Selecione o funcionário</option>
+                                            </select>
+                                            <span class="campo-erro" id="erro-funcionario"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Período -->
+                                    <div class="form-section">
+                                        <h4>Período da Locação</h4>
+                                        <div class="form-row-2">
+                                            <div class="form-field">
+                                                <label for="alocar-data-saida">Data de Saída <span class="obrigatorio">*</span></label>
+                                                <input type="date" id="alocar-data-saida" oninput="calcularResumo()">
+                                                <span class="campo-erro" id="erro-data-saida"></span>
+                                            </div>
+                                            <div class="form-field">
+                                                <label for="alocar-data-retorno">Data de Retorno Prevista <span class="obrigatorio">*</span></label>
+                                                <input type="date" id="alocar-data-retorno" oninput="calcularResumo()">
+                                                <span class="campo-erro" id="erro-data-retorno"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Quilometragem -->
+                                    <div class="form-section">
+                                        <h4>Quilometragem</h4>
+                                        <div class="form-field">
+                                            <label for="alocar-km-saida">KM de Saída <span class="obrigatorio">*</span></label>
+                                            <input type="number" id="alocar-km-saida" placeholder="Ex: 45000" min="0">
+                                            <span class="campo-erro" id="erro-km-saida"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Status da Locação -->
+                                    <div class="form-section">
+                                        <h4>Detalhes da Locação</h4>
+                                        <div class="form-field">
+                                            <label for="alocar-status">Status da Locação <span class="obrigatorio">*</span></label>
+                                            <select id="alocar-status">
+                                                <option value="">Selecione o status</option>
+                                                <option value="Reservado">Reservado</option>
+                                                <option value="Ativo">Ativo</option>
+                                                <option value="Concluído">Concluído</option>
+                                                <option value="Cancelado">Cancelado</option>
+                                            </select>
+                                            <span class="campo-erro" id="erro-status"></span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Pagamento -->
+                                    <div class="form-section">
+                                        <h4>Pagamento</h4>
+                                        <div class="form-field">
+                                            <label for="alocar-pagamento">Forma de Pagamento <span class="obrigatorio">*</span></label>
+                                            <select id="alocar-pagamento">
+                                                <option value="">Selecione a forma de pagamento</option>
+                                                <option value="Dinheiro">Dinheiro</option>
+                                                <option value="Cartão de Débito">Cartão de Débito</option>
+                                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                                <option value="PIX">PIX</option>
+                                                <option value="Boleto">Boleto</option>
+                                            </select>
+                                            <span class="campo-erro" id="erro-pagamento"></span>
+                                        </div>
+                                        <div class="form-field">
+                                            <label for="alocar-entrada">Valor de Entrada (R$)</label>
+                                            <input type="number" id="alocar-entrada" placeholder="0,00" min="0" step="0.01">
+                                        </div>
+                                    </div>
+
+                                    <!-- Resumo Visual -->
+                                    <div class="resumo-locacao">
+                                        <h4>Resumo da Locação</h4>
+                                        <div class="resumo-linha">
+                                            <span>Veículo</span>
+                                            <span id="res-veiculo">—</span>
+                                        </div>
+                                        <div class="resumo-linha">
+                                            <span>Período</span>
+                                            <span id="res-periodo">—</span>
+                                        </div>
+                                        <div class="resumo-linha">
+                                            <span>Duração</span>
+                                            <span id="res-dias">—</span>
+                                        </div>
+                                        <div class="resumo-linha">
+                                            <span>Valor Diário</span>
+                                            <span id="res-valor-diario">—</span>
+                                        </div>
+                                        <div class="resumo-linha resumo-total">
+                                            <span>Total Estimado</span>
+                                            <span id="res-total">—</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-actions">
+                                        <button type="button" class="btn-cancelar" onclick="voltarParaVeiculos()">Cancelar</button>
+                                        <button type="submit" class="btn-confirmar">Confirmar Alocação</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -142,8 +308,7 @@
                                 <input type="text" id="input-modelo-veiculo" placeholder="Modelo">
                             </div>
                             <div class="form-row">
-                                <input type="number" id="input-ano-veiculo" placeholder="Ano de Fabricação" min="1900"
-                                    max="2030">
+                                <input type="number" id="input-ano-veiculo" placeholder="Ano de Fabricação" min="1900" max="2030">
                                 <input type="text" id="input-placa-veiculo" placeholder="Placa (ABC-1234)">
                             </div>
                             <input type="text" id="input-renavam-veiculo" placeholder="RENAVAM">
@@ -166,8 +331,7 @@
                                     <option value="Elétrico">Elétrico</option>
                                     <option value="Híbrido">Híbrido</option>
                                 </select>
-                                <input type="number" id="input-valor-diario-veiculo" placeholder="Valor Diário (R$)"
-                                    min="0" step="0.01">
+                                <input type="number" id="input-valor-diario-veiculo" placeholder="Valor Diário (R$)" min="0" step="0.01">
                             </div>
                             <select id="input-status-veiculo">
                                 <option value="" disabled selected>Status</option>
@@ -179,8 +343,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancelar"
-                                onclick="fecharFormularioVeiculo()">Cancelar</button>
+                            <button type="button" class="btn-cancelar" onclick="fecharFormularioVeiculo()">Cancelar</button>
                             <button type="button" onclick="cadastrarVeiculo()">Cadastrar Veículo</button>
                         </div>
                     </form>
@@ -245,8 +408,7 @@
                         </div>
 
                         <div class="form-actions">
-                            <button type="button" class="btn-cancelar"
-                                onclick="fecharFormularioCliente()">Cancelar</button>
+                            <button type="button" class="btn-cancelar" onclick="fecharFormularioCliente()">Cancelar</button>
                             <button type="button" onclick="cadastrarCliente()">Cadastrar Cliente</button>
                         </div>
                     </form>
