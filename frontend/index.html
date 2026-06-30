@@ -533,7 +533,7 @@
                         <div class="form-actions">
                             <button type="button" class="btn-cancelar"
                                 onclick="fecharFormularioVeiculo()">Cancelar</button>
-                            <button type="button" onclick="cadastrarVeiculo()">Cadastrar Veículo</button>
+                            <button type="button" id="btn-salvar-veiculo" onclick="salvarVeiculo()">Cadastrar Veículo</button>
                         </div>
                     </form>
                 </div>
@@ -600,7 +600,7 @@
                         <div class="form-actions">
                             <button type="button" class="btn-cancelar"
                                 onclick="fecharFormularioCliente()">Cancelar</button>
-                            <button type="button" onclick="cadastrarCliente()">Cadastrar Cliente</button>
+                            <button type="button" id="btn-salvar-cliente" onclick="salvarCliente()">Cadastrar Cliente</button>
                         </div>
                     </form>
                 </div>
@@ -622,7 +622,6 @@
                                     <th>Telefone</th>
                                     <th>Cargo</th>
                                     <th>Salário</th>
-                                    <th>Ações</th>
                                 </tr>
                             </thead>
                             <tbody id="tbody-funcionarios"></tbody>
@@ -684,7 +683,7 @@
                         <div class="form-actions">
                             <button type="button" class="btn-cancelar"
                                 onclick="fecharFormularioFuncionario()">Cancelar</button>
-                            <button type="button" onclick="cadastrarFuncionario()">Cadastrar Funcionário</button>
+                            <button type="button" id="btn-salvar-funcionario" onclick="salvarFuncionario()">Cadastrar Funcionário</button>
                         </div>
                     </form>
                 </div>

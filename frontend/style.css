@@ -55,6 +55,7 @@ body {
 }
 
 .nav-item {
+    font-weight: bold;
     display: block;
     color: rgba(255, 255, 255, 0.52);
     text-decoration: none;
@@ -132,6 +133,16 @@ body {
 
 .btn-action.outline:hover {
     background-color: #f0f4f8;
+}
+
+.btn-action.btn-perigo {
+    background-color: #fff;
+    color: #c0392b;
+    border: 1px solid #f5c6cb;
+}
+
+.btn-action.btn-perigo:hover {
+    background-color: #fdecea;
 }
 
 /* =====================
@@ -798,8 +809,20 @@ body {
     font-weight: 600;
 }
 
+.data-table tbody tr {
+    cursor: pointer;
+}
+
 .data-table tr:hover {
     background-color: #fafbfc;
+}
+
+.data-table tr.linha-selecionada {
+    background-color: #e3ecf5;
+}
+
+.data-table tr.linha-selecionada:hover {
+    background-color: #d8e4f0;
 }
 
 /* =====================

@@ -44,42 +44,46 @@ let veiculos = [
         id: 1, nome: "Corolla", renavam: "12345678901", marca: "Toyota",
         ano: 2022, placa: "ABC-1234", img: "resources/veiculos/corolla.png",
         status: "Disponível", cor: "Branco Pérola", combustivel: "Flex",
-        km_atual: 45000, valor_diario: 180.00, cliente: null
+        km_atual: 45000, valor_diario: 180.00, cliente: null, ativo: true
     },
     {
         id: 2, nome: "Civic", renavam: "98765432109", marca: "Honda",
         ano: 2021, placa: "DEF-5678", img: "resources/veiculos/civic.png",
         status: "Alugado", cor: "Cinza Metálico", combustivel: "Gasolina",
         km_atual: 32000, valor_diario: 200.00,
-        cliente: { nome: "Bruno Alcantara", cpf: "123.456.789-01" }
+        cliente: { nome: "Bruno Alcantara", cpf: "123.456.789-01" }, ativo: true
     },
     {
         id: 3, nome: "Duster", renavam: "45678912345", marca: "Renault",
         ano: 2023, placa: "GHI-9012", img: "resources/veiculos/duster.png",
         status: "Em manutenção", cor: "Prata", combustivel: "Flex",
-        km_atual: 18000, valor_diario: 220.00, cliente: null
+        km_atual: 18000, valor_diario: 220.00, cliente: null, ativo: true
     }
 ];
 
 let clientes = [
     {
+        id: 1,
         nome: "Bruno Alcantara",
         cpf: "123.456.789-01",
         email: "bruno@email.com",
-        telefone: "(45) 99999-1111"
+        telefone: "(45) 99999-1111",
+        ativo: true
     },
     {
+        id: 2,
         nome: "Ian Batista",
         cpf: "234.567.890-12",
         email: "ian@email.com",
-        telefone: "(45) 99999-2222"
+        telefone: "(45) 99999-2222",
+        ativo: true
     }
 ];
 
 let funcionarios = [
-    { id: 1, nome: "Ana Silva", cpf: "111.222.333-44", email: "ana@email.com", telefone: "(45) 99111-2222", cargo: "Atendente", salario: 2500.00, admissao: "2023-01-15" },
-    { id: 2, nome: "Carlos Souza", cpf: "222.333.444-55", email: "carlos@email.com", telefone: "(45) 99333-4444", cargo: "Gerente", salario: 5000.00, admissao: "2022-03-10" },
-    { id: 3, nome: "Mariana Costa", cpf: "333.444.555-66", email: "mariana@email.com", telefone: "(45) 99555-6666", cargo: "Atendente", salario: 2500.00, admissao: "2023-06-20" }
+    { id: 1, nome: "Ana Silva", cpf: "111.222.333-44", email: "ana@email.com", telefone: "(45) 99111-2222", cargo: "Atendente", salario: 2500.00, admissao: "2023-01-15", ativo: true },
+    { id: 2, nome: "Carlos Souza", cpf: "222.333.444-55", email: "carlos@email.com", telefone: "(45) 99333-4444", cargo: "Gerente", salario: 5000.00, admissao: "2022-03-10", ativo: true },
+    { id: 3, nome: "Mariana Costa", cpf: "333.444.555-66", email: "mariana@email.com", telefone: "(45) 99555-6666", cargo: "Atendente", salario: 2500.00, admissao: "2023-06-20", ativo: true }
 ];
 
 let locacoes = [
@@ -129,6 +133,47 @@ const estadosCidades = {
 
 let indexVeiculoSelecionado = null;
 
+// Registro (id) atualmente selecionado por tabela, usado para edição/exclusão
+const selecionados = { veiculo: null, cliente: null, funcionario: null };
+
+let paginaAtual = "pag-dashboard";
+
+/*
+    USUÁRIO / PERMISSÕES
+
+    Simulação simples de autenticação no frontend. Quando houver um backend
+    real, basta trocar `autenticar()` por uma chamada de API e manter o
+    restante (usuarioLogado, aplicarPermissoes, usuarioEhGerente) igual.
+*/
+
+const USUARIOS_SISTEMA = [
+    { usuario: "gerente", senha: "123", perfil: "gerente", nome: "Gerente" },
+    { usuario: "funcionario", senha: "123", perfil: "funcionario", nome: "Funcionário" }
+];
+
+let usuarioLogado = null;
+
+function autenticar(usuario, senha) {
+    return USUARIOS_SISTEMA.find(u => u.usuario === usuario && u.senha === senha) || null;
+}
+
+function usuarioEhGerente() {
+    return !!usuarioLogado && usuarioLogado.perfil === "gerente";
+}
+
+function paginaPermitida(paginaId) {
+    if (usuarioEhGerente()) return true;
+    return paginaId !== "pag-cadastro-veiculos" && paginaId !== "pag-cadastro-funcionarios";
+}
+
+function aplicarPermissoes() {
+    const ehGerente = usuarioEhGerente();
+    document.querySelectorAll(".nav-item").forEach(item => {
+        const restrita = item.dataset.page === "pag-cadastro-veiculos" || item.dataset.page === "pag-cadastro-funcionarios";
+        item.style.display = (restrita && !ehGerente) ? "none" : "";
+    });
+}
+
 /*
     CONFIG. ACTION BAR
 */
@@ -136,31 +181,61 @@ let indexVeiculoSelecionado = null;
 const actionBarConfig = {
     "pag-dashboard": {
         title: "Dashboard",
-        actions: []
+        actions: () => []
     },
     "pag-alocacao": {
         title: "Alocação de Veículos",
-        actions: []
+        actions: () => []
     },
     "pag-cadastro-veiculos": {
         title: "Veículos",
-        actions: [
-            { label: "Novo Veículo", onclick: "alternarFormularioVeiculo()", primary: true }
-        ]
+        actions: () => {
+            if (!usuarioEhGerente()) return [];
+            const sel = selecionados.veiculo;
+            const acoes = [
+                { label: sel ? "Editar Veículo" : "Novo Veículo", onclick: "alternarFormularioVeiculo()", primary: true }
+            ];
+            if (sel) acoes.push({ label: "Excluir Veículo", onclick: `inativarVeiculo(${sel})`, perigo: true });
+            return acoes;
+        }
     },
     "pag-cadastro-clientes": {
         title: "Clientes",
-        actions: [
-            { label: "Novo Cliente", onclick: "alternarFormularioCliente()", primary: true }
-        ]
+        actions: () => {
+            const sel = selecionados.cliente;
+            const acoes = [
+                { label: sel ? "Editar Cliente" : "Novo Cliente", onclick: "alternarFormularioCliente()", primary: true }
+            ];
+            if (sel) acoes.push({ label: "Excluir Cliente", onclick: `inativarCliente(${sel})`, perigo: true });
+            return acoes;
+        }
     },
     "pag-cadastro-funcionarios": {
         title: "Funcionários",
-        actions: [
-            { label: "Novo Funcionário", onclick: "alternarFormularioFuncionario()", primary: true }
-        ]
+        actions: () => {
+            if (!usuarioEhGerente()) return [];
+            const sel = selecionados.funcionario;
+            const acoes = [
+                { label: sel ? "Editar Funcionário" : "Novo Funcionário", onclick: "alternarFormularioFuncionario()", primary: true }
+            ];
+            if (sel) acoes.push({ label: "Excluir Funcionário", onclick: `inativarFuncionario(${sel})`, perigo: true });
+            return acoes;
+        }
     }
 };
+
+function renderActionBarFor(paginaId) {
+    const config = actionBarConfig[paginaId];
+    if (!config) return;
+    dom.actionBarTitle.textContent = config.title;
+    dom.actionBarActions.innerHTML = config.actions().map(action =>
+        `<button class="btn-action${action.primary ? "" : " outline"}${action.perigo ? " btn-perigo" : ""}" onclick="${action.onclick}">${action.label}</button>`
+    ).join("");
+}
+
+function atualizarActionBar() {
+    renderActionBarFor(paginaAtual);
+}
 
 /*
     LOGIN
@@ -177,6 +252,15 @@ function fazerLogin(event) {
         return;
     }
 
+    const encontrado = autenticar(usuario, senha);
+    if (!encontrado) {
+        erro.textContent = "Usuário ou senha inválidos.";
+        return;
+    }
+
+    usuarioLogado = { usuario: encontrado.usuario, perfil: encontrado.perfil, nome: encontrado.nome };
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuarioLogado));
+
     erro.textContent = "";
     dom.loginScreen.style.display = "none";
     dom.layout.style.display = "flex";
@@ -189,6 +273,7 @@ function fazerLogin(event) {
 
 function fazerLogout() {
     if (confirm("Tem certeza que deseja sair?")) {
+        usuarioLogado = null;
         localStorage.removeItem("usuarioLogado");
         sessionStorage.clear();
 
@@ -206,6 +291,7 @@ function fazerLogout() {
 */
 
 function init() {
+    aplicarPermissoes();
     render();
     mostrarPagina("pag-dashboard");
 }
@@ -231,6 +317,45 @@ function limparBuscas() {
     });
 }
 
+/*
+    EXCLUSÃO LÓGICA / SELEÇÃO DE REGISTROS (Veículos / Clientes / Funcionários)
+*/
+
+function filtrarAtivos(lista) {
+    return lista.filter(item => item.ativo !== false);
+}
+
+function proximoId(lista) {
+    return lista.reduce((max, item) => Math.max(max, item.id || 0), 0) + 1;
+}
+
+const TBODY_POR_TIPO = () => ({
+    veiculo: dom.tbodyVeiculos,
+    cliente: dom.tbodyClientes,
+    funcionario: dom.tbodyFuncionarios
+});
+
+function selecionarRegistro(tipo, id) {
+    selecionados[tipo] = selecionados[tipo] === id ? null : id;
+    atualizarDestaqueSelecao(tipo);
+    atualizarActionBar();
+}
+
+function limparSelecao(tipo) {
+    selecionados[tipo] = null;
+    atualizarDestaqueSelecao(tipo);
+    atualizarActionBar();
+}
+
+function atualizarDestaqueSelecao(tipo) {
+    const tbody = TBODY_POR_TIPO()[tipo];
+    if (!tbody) return;
+    const idSelecionado = selecionados[tipo];
+    tbody.querySelectorAll("tr[data-id]").forEach(tr => {
+        tr.classList.toggle("linha-selecionada", String(idSelecionado) === tr.dataset.id);
+    });
+}
+
 function alternarVisaoAlocacao(view) {
     document.querySelectorAll(".alocacao-toggle-btn").forEach(btn => {
         btn.classList.toggle("active", btn.dataset.view === view);
@@ -246,7 +371,7 @@ function alternarVisaoAlocacao(view) {
 */
 
 function renderSecaoDisponiveis(dados) {
-    const lista = dados !== undefined ? dados : veiculos.filter(v => veiculoDisponivel(v));
+    const lista = dados !== undefined ? dados : filtrarAtivos(veiculos).filter(v => veiculoDisponivel(v));
     const container = document.getElementById("alocacao-disponiveis");
     const msg = document.getElementById("msg-sem-disponiveis");
     if (!container) return;
@@ -284,7 +409,7 @@ function criarCardDisponivel(v, idx) {
 */
 
 function renderSecaoReservados(dados) {
-    const lista = dados !== undefined ? dados : veiculos.filter(v => !veiculoDisponivel(v));
+    const lista = dados !== undefined ? dados : filtrarAtivos(veiculos).filter(v => !veiculoDisponivel(v));
     const container = document.getElementById("alocacao-reservados");
     const msg = document.getElementById("msg-sem-reservados");
     if (!container) return;
@@ -330,13 +455,14 @@ function criarCardReservado(v, idx) {
 }
 
 function renderDashboard() {
-    const alocados = veiculos.filter(v => v.cliente !== null);
-    const disponiveis = veiculos.filter(v => veiculoDisponivel(v));
+    const veiculosAtivos = filtrarAtivos(veiculos);
+    const alocados = veiculosAtivos.filter(v => v.cliente !== null);
+    const disponiveis = veiculosAtivos.filter(v => veiculoDisponivel(v));
 
-    dom.statTotalVeiculos.textContent = veiculos.length;
+    dom.statTotalVeiculos.textContent = veiculosAtivos.length;
     dom.statDisponiveis.textContent = disponiveis.length;
     dom.statAlocados.textContent = alocados.length;
-    dom.statTotalClientes.textContent = clientes.length;
+    dom.statTotalClientes.textContent = filtrarAtivos(clientes).length;
 
     dom.listaAlocacoes.innerHTML = alocados.length === 0
         ? '<p class="empty-state">Nenhum veículo alocado no momento.</p>'
@@ -350,7 +476,7 @@ function renderDashboard() {
 
 function renderTabelaVeiculos(dados) {
     if (!dom.tbodyVeiculos) return;
-    const lista = dados !== undefined ? dados : veiculos;
+    const lista = dados !== undefined ? dados : filtrarAtivos(veiculos);
 
     if (lista.length === 0) {
         dom.tbodyVeiculos.innerHTML = '<tr><td colspan="5" class="empty-state">Nenhum veículo encontrado.</td></tr>';
@@ -361,7 +487,7 @@ function renderTabelaVeiculos(dados) {
         const statusTexto = v.cliente ? "Alugado" : (v.status || "Disponível");
         const clienteTexto = v.cliente ? v.cliente.nome : "—";
         return `
-            <tr>
+            <tr data-id="${v.id}" onclick="selecionarRegistro('veiculo', ${v.id})">
                 <td>${v.nome || "—"}</td>
                 <td>${v.marca || "—"}</td>
                 <td>${v.placa || "—"}</td>
@@ -370,11 +496,12 @@ function renderTabelaVeiculos(dados) {
             </tr>
         `;
     }).join("");
+    atualizarDestaqueSelecao("veiculo");
 }
 
 function renderTabelaClientes(dados) {
     if (!dom.tbodyClientes) return;
-    const lista = dados !== undefined ? dados : clientes;
+    const lista = dados !== undefined ? dados : filtrarAtivos(clientes);
 
     if (lista.length === 0) {
         dom.tbodyClientes.innerHTML = '<tr><td colspan="4" class="empty-state">Nenhum cliente encontrado.</td></tr>';
@@ -382,37 +509,36 @@ function renderTabelaClientes(dados) {
     }
 
     dom.tbodyClientes.innerHTML = lista.map(c => `
-        <tr>
+        <tr data-id="${c.id}" onclick="selecionarRegistro('cliente', ${c.id})">
             <td>${c.nome || "—"}</td>
             <td>${c.cpf || "—"}</td>
             <td>${c.email || "—"}</td>
             <td>${c.telefone || "—"}</td>
         </tr>
     `).join("");
+    atualizarDestaqueSelecao("cliente");
 }
 
 function renderTabelaFuncionarios(dados) {
     if (!dom.tbodyFuncionarios) return;
-    const lista = dados !== undefined ? dados : funcionarios;
+    const lista = dados !== undefined ? dados : filtrarAtivos(funcionarios);
 
     if (lista.length === 0) {
-        dom.tbodyFuncionarios.innerHTML = '<tr><td colspan="7" class="empty-state">Nenhum funcionário encontrado.</td></tr>';
+        dom.tbodyFuncionarios.innerHTML = '<tr><td colspan="6" class="empty-state">Nenhum funcionário encontrado.</td></tr>';
         return;
     }
 
     dom.tbodyFuncionarios.innerHTML = lista.map(f => `
-        <tr>
+        <tr data-id="${f.id}" onclick="selecionarRegistro('funcionario', ${f.id})">
             <td>${f.nome || "—"}</td>
             <td>${f.cpf || "—"}</td>
             <td>${f.email || "—"}</td>
             <td>${f.telefone || "—"}</td>
             <td>${f.cargo || "—"}</td>
             <td>${f.salario != null ? "R$ " + formatarMoeda(f.salario) : "—"}</td>
-            <td>
-                <button class="btn-action outline" onclick="deletarFuncionario(${funcionarios.indexOf(f)})" style="font-size:11px;padding:4px 10px;color:#c0392b;border-color:#f5c6cb">Excluir</button>
-            </td>
         </tr>
     `).join("");
+    atualizarDestaqueSelecao("funcionario");
 }
 
 /*
@@ -420,9 +546,10 @@ function renderTabelaFuncionarios(dados) {
 */
 
 function buscarVeiculos(termo) {
-    if (!termo) return veiculos;
+    const base = filtrarAtivos(veiculos);
+    if (!termo) return base;
     const t = termo.toLowerCase();
-    return veiculos.filter(v =>
+    return base.filter(v =>
         (v.nome || "").toLowerCase().includes(t) ||
         (v.marca || "").toLowerCase().includes(t) ||
         (v.placa || "").toLowerCase().includes(t) ||
@@ -431,9 +558,10 @@ function buscarVeiculos(termo) {
 }
 
 function buscarClientes(termo) {
-    if (!termo) return clientes;
+    const base = filtrarAtivos(clientes);
+    if (!termo) return base;
     const t = termo.toLowerCase();
-    return clientes.filter(c =>
+    return base.filter(c =>
         (c.nome || "").toLowerCase().includes(t) ||
         (c.cpf || "").toLowerCase().includes(t) ||
         (c.email || "").toLowerCase().includes(t)
@@ -455,12 +583,13 @@ function filtrarVeiculosAlocacao(termo) {
 }
 
 function filtrarTabelaFuncionarios(termo) {
+    const base = filtrarAtivos(funcionarios);
     if (!termo) {
-        renderTabelaFuncionarios();
+        renderTabelaFuncionarios(base);
         return;
     }
     const t = termo.toLowerCase();
-    const filtrados = funcionarios.filter(f =>
+    const filtrados = base.filter(f =>
         (f.nome || "").toLowerCase().includes(t) ||
         (f.cpf || "").toLowerCase().includes(t) ||
         (f.email || "").toLowerCase().includes(t) ||
@@ -474,6 +603,12 @@ function filtrarTabelaFuncionarios(termo) {
 */
 
 function mostrarPagina(paginaId) {
+    if (!paginaPermitida(paginaId)) {
+        alert("Você não tem permissão para acessar esta área.");
+        paginaId = "pag-dashboard";
+    }
+
+    paginaAtual = paginaId;
     voltarParaVeiculos();
 
     Object.values(pages).forEach(page => { if (page) page.style.display = "none"; });
@@ -485,22 +620,20 @@ function mostrarPagina(paginaId) {
     page.style.display = flexPages.includes(paginaId) ? "flex" : "block";
 
     if (paginaId !== "pag-cadastro-veiculos") {
-        fecharFormulario(dom.formVeiculos, dom.tabelaVeiculos);
+        fecharFormularioVeiculo();
+    }
+    if (paginaId !== "pag-cadastro-clientes") {
+        fecharFormularioCliente();
     }
     if (paginaId !== "pag-cadastro-funcionarios") {
-        fecharFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
+        fecharFormularioFuncionario();
     }
 
     document.querySelectorAll(".nav-item").forEach(item => {
         item.classList.toggle("active", item.dataset.page === paginaId);
     });
 
-    const config = actionBarConfig[paginaId];
-    if (!config) return;
-    dom.actionBarTitle.textContent = config.title;
-    dom.actionBarActions.innerHTML = config.actions.map(action =>
-        `<button class="btn-action${action.primary ? "" : " outline"}" onclick="${action.onclick}">${action.label}</button>`
-    ).join("");
+    renderActionBarFor(paginaId);
 }
 
 /*
@@ -508,7 +641,7 @@ function mostrarPagina(paginaId) {
 */
 
 function veiculoDisponivel(v) {
-    return v.cliente === null && v.status === "Disponível";
+    return v.ativo !== false && v.cliente === null && v.status === "Disponível";
 }
 
 function getStatusVeiculo(v) {
@@ -600,7 +733,9 @@ function voltarParaVeiculos() {
 function popularSelectClientes() {
     const sel = document.getElementById("alocar-cliente");
     sel.innerHTML = '<option value="">Selecione o cliente</option>';
+    // mantém o índice real do array (locações referenciam por índice), apenas pulando inativos
     clientes.forEach((c, i) => {
+        if (c.ativo === false) return;
         const opt = document.createElement("option");
         opt.value = i;
         opt.textContent = `${c.nome} — ${c.cpf}`;
@@ -612,6 +747,7 @@ function popularSelectFuncionarios() {
     const sel = document.getElementById("alocar-funcionario");
     sel.innerHTML = '<option value="">Selecione o funcionário</option>';
     funcionarios.forEach((f, i) => {
+        if (f.ativo === false) return;
         const opt = document.createElement("option");
         opt.value = i;
         opt.textContent = `${f.nome} — ${f.cargo}`;
@@ -976,10 +1112,10 @@ function confirmarFinalizacao(event) {
 }
 
 /*
-    CADASTRO DOS VEÍCULOS
+    CADASTRO / EDIÇÃO DOS VEÍCULOS
 */
 
-function cadastrarVeiculo() {
+function lerCamposVeiculo() {
     const marca = document.getElementById("input-marca-veiculo").value.trim();
     const modelo = document.getElementById("input-modelo-veiculo").value.trim();
     const ano = document.getElementById("input-ano-veiculo").value.trim();
@@ -992,29 +1128,90 @@ function cadastrarVeiculo() {
     const status = document.getElementById("input-status-veiculo").value;
     const imagem = document.getElementById("input-imagem-veiculo").value.trim();
 
-    if (!marca || !modelo || !placa || !renavam) return;
+    if (!marca || !modelo || !placa || !renavam) return null;
 
-    veiculos.push({
-        id: veiculos.length + 1,
+    return {
         nome: modelo, marca, ano: ano ? parseInt(ano) : null,
         placa, renavam, cor,
         km_atual: km ? parseInt(km) : null,
         combustivel,
         valor_diario: valorDiario ? parseFloat(valorDiario) : null,
         status: status || "Disponível",
-        img: imagem, cliente: null
-    });
+        img: imagem
+    };
+}
+
+function cadastrarVeiculo() {
+    const dados = lerCamposVeiculo();
+    if (!dados) return;
+
+    veiculos.push({ id: proximoId(veiculos), ativo: true, cliente: null, ...dados });
 
     dom.formVeiculos.reset();
     fecharFormularioVeiculo();
     render();
 }
 
+function abrirEdicaoVeiculo(id) {
+    const v = veiculos.find(x => x.id === id);
+    if (!v) { limparSelecao("veiculo"); return; }
+
+    document.getElementById("input-marca-veiculo").value = v.marca || "";
+    document.getElementById("input-modelo-veiculo").value = v.nome || "";
+    document.getElementById("input-ano-veiculo").value = v.ano ?? "";
+    document.getElementById("input-placa-veiculo").value = v.placa || "";
+    document.getElementById("input-renavam-veiculo").value = v.renavam || "";
+    document.getElementById("input-cor-veiculo").value = v.cor || "";
+    document.getElementById("input-km-veiculo").value = v.km_atual ?? "";
+    document.getElementById("input-combustivel-veiculo").value = v.combustivel || "";
+    document.getElementById("input-valor-diario-veiculo").value = v.valor_diario ?? "";
+    document.getElementById("input-status-veiculo").value = v.status || "";
+    document.getElementById("input-imagem-veiculo").value = v.img || "";
+
+    abrirFormularioCadastro(dom.formVeiculos, dom.tabelaVeiculos);
+    configurarBotaoFormVeiculo(true);
+}
+
+function salvarVeiculo() {
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+
+    const idEdicao = selecionados.veiculo;
+    if (idEdicao) {
+        const dados = lerCamposVeiculo();
+        if (!dados) return;
+        const v = veiculos.find(x => x.id === idEdicao);
+        if (v) Object.assign(v, dados);
+        dom.formVeiculos.reset();
+        fecharFormularioVeiculo();
+        render();
+    } else {
+        cadastrarVeiculo();
+    }
+}
+
+function inativarVeiculo(id) {
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+
+    const v = veiculos.find(x => x.id === id);
+    if (!v) return;
+
+    if (v.cliente !== null || v.status === "Alugado") {
+        alert(`Não é possível excluir o veículo "${v.marca} ${v.nome}" pois ele está alugado/alocado no momento.`);
+        return;
+    }
+
+    if (!confirm(`Tem certeza que deseja excluir o veículo "${v.marca} ${v.nome}"? Ele será inativado e deixará de aparecer no sistema.`)) return;
+
+    v.ativo = false;
+    limparSelecao("veiculo");
+    render();
+}
+
 /*
-    CADASTRO DOS CLIENTES
+    CADASTRO / EDIÇÃO DOS CLIENTES
 */
 
-function cadastrarCliente() {
+function lerCamposCliente() {
     const nome = document.getElementById("input-nome-cliente").value.trim();
     const cpf = document.getElementById("input-cpf-cliente").value.trim();
     const nascimento = document.getElementById("input-nascimento-cliente").value;
@@ -1029,61 +1226,196 @@ function cadastrarCliente() {
     const numEnd = document.getElementById("input-numero-end-cliente").value.trim();
     const complemento = document.getElementById("input-complemento-cliente").value.trim();
 
-    if (!nome || !cpf) return;
+    if (!nome || !cpf) return null;
 
-    clientes.push({
+    return {
         nome, cpf, nascimento, sexo, email, telefone,
         endereco: { cep, estado, cidade, bairro, rua, numero: numEnd, complemento }
-    });
+    };
+}
+
+function cadastrarCliente() {
+    const dados = lerCamposCliente();
+    if (!dados) return;
+
+    clientes.push({ id: proximoId(clientes), ativo: true, ...dados });
 
     dom.formClientes.reset();
     fecharFormularioCliente();
     render();
 }
 
+function abrirEdicaoCliente(id) {
+    const c = clientes.find(x => x.id === id);
+    if (!c) { limparSelecao("cliente"); return; }
+
+    const end = c.endereco || {};
+    document.getElementById("input-nome-cliente").value = c.nome || "";
+    document.getElementById("input-cpf-cliente").value = c.cpf || "";
+    document.getElementById("input-nascimento-cliente").value = c.nascimento || "";
+    document.getElementById("input-sexo-cliente").value = c.sexo || "";
+    document.getElementById("input-email-cliente").value = c.email || "";
+    document.getElementById("input-telefone-cliente").value = c.telefone || "";
+    document.getElementById("input-cep-cliente").value = end.cep || "";
+    document.getElementById("input-estado-cliente").value = end.estado || "";
+    document.getElementById("input-cidade-cliente").value = end.cidade || "";
+    document.getElementById("input-bairro-cliente").value = end.bairro || "";
+    document.getElementById("input-rua-cliente").value = end.rua || "";
+    document.getElementById("input-numero-end-cliente").value = end.numero || "";
+    document.getElementById("input-complemento-cliente").value = end.complemento || "";
+
+    abrirFormularioCadastro(dom.formClientes, dom.tabelaClientes);
+    configurarBotaoFormCliente(true);
+}
+
+function salvarCliente() {
+    const idEdicao = selecionados.cliente;
+    if (idEdicao) {
+        const dados = lerCamposCliente();
+        if (!dados) return;
+        const c = clientes.find(x => x.id === idEdicao);
+        if (c) Object.assign(c, dados);
+        dom.formClientes.reset();
+        fecharFormularioCliente();
+        render();
+    } else {
+        cadastrarCliente();
+    }
+}
+
+function inativarCliente(id) {
+    const c = clientes.find(x => x.id === id);
+    if (!c) return;
+
+    const idx = clientes.indexOf(c);
+    const vinculado = locacoes.some(l => l.idx_cliente === idx && (l.status === "Ativo" || l.status === "Reservado"));
+    if (vinculado) {
+        alert(`Não é possível excluir o cliente "${c.nome}" pois ele possui uma locação ativa.`);
+        return;
+    }
+
+    if (!confirm(`Tem certeza que deseja excluir o cliente "${c.nome}"? Ele será inativado e deixará de aparecer no sistema.`)) return;
+
+    c.ativo = false;
+    limparSelecao("cliente");
+    render();
+}
+
 /*
-    CADASTRO DE FUNCIONÁRIOS
+    CADASTRO / EDIÇÃO DE FUNCIONÁRIOS
 */
 
-function cadastrarFuncionario() {
+function lerCamposFuncionario() {
     const nome = document.getElementById("input-nome-funcionario").value.trim();
     const cpf = document.getElementById("input-cpf-funcionario").value.trim();
     const nascimento = document.getElementById("input-nascimento-funcionario").value;
     const sexo = document.getElementById("input-sexo-funcionario").value;
     const email = document.getElementById("input-email-funcionario").value.trim();
     const telefone = document.getElementById("input-telefone1-funcionario").value.trim();
+    const telefone2 = document.getElementById("input-telefone2-funcionario").value.trim();
+    const cep = document.getElementById("input-cep-funcionario").value.trim();
+    const estado = document.getElementById("input-estado-funcionario").value.trim();
+    const cidade = document.getElementById("input-cidade-funcionario").value.trim();
+    const bairro = document.getElementById("input-bairro-funcionario").value.trim();
+    const rua = document.getElementById("input-rua-funcionario").value.trim();
+    const numEnd = document.getElementById("input-numero-end-funcionario").value.trim();
+    const complemento = document.getElementById("input-complemento-funcionario").value.trim();
     const cargo = document.getElementById("input-cargo-funcionario").value.trim();
     const salario = document.getElementById("input-salario-funcionario").value;
     const admissao = document.getElementById("input-admissao-funcionario").value;
 
-    if (!nome || !cpf || !cargo) return;
+    if (!nome || !cpf || !cargo) return null;
 
-    funcionarios.push({
-        id: funcionarios.length + 1,
-        nome, cpf, nascimento, sexo, email, telefone, cargo,
+    return {
+        nome, cpf, nascimento, sexo, email, telefone, telefone2, cargo,
         salario: salario ? parseFloat(salario) : null,
-        admissao
-    });
+        admissao,
+        endereco: { cep, estado, cidade, bairro, rua, numero: numEnd, complemento }
+    };
+}
+
+function cadastrarFuncionario() {
+    const dados = lerCamposFuncionario();
+    if (!dados) return;
+
+    funcionarios.push({ id: proximoId(funcionarios), ativo: true, ...dados });
 
     dom.formFuncionarios.reset();
     fecharFormularioFuncionario();
-    renderTabelaFuncionarios();
+    render();
 }
 
-function deletarFuncionario(idx) {
-    if (!confirm(`Tem certeza que deseja excluir o funcionário "${funcionarios[idx]?.nome}"?`)) return;
-    funcionarios.splice(idx, 1);
-    renderTabelaFuncionarios();
+function abrirEdicaoFuncionario(id) {
+    const f = funcionarios.find(x => x.id === id);
+    if (!f) { limparSelecao("funcionario"); return; }
+
+    const end = f.endereco || {};
+    document.getElementById("input-nome-funcionario").value = f.nome || "";
+    document.getElementById("input-cpf-funcionario").value = f.cpf || "";
+    document.getElementById("input-nascimento-funcionario").value = f.nascimento || "";
+    document.getElementById("input-sexo-funcionario").value = f.sexo || "";
+    document.getElementById("input-email-funcionario").value = f.email || "";
+    document.getElementById("input-telefone1-funcionario").value = f.telefone || "";
+    document.getElementById("input-telefone2-funcionario").value = f.telefone2 || "";
+    document.getElementById("input-cep-funcionario").value = end.cep || "";
+    document.getElementById("input-estado-funcionario").value = end.estado || "";
+    document.getElementById("input-cidade-funcionario").value = end.cidade || "";
+    document.getElementById("input-bairro-funcionario").value = end.bairro || "";
+    document.getElementById("input-rua-funcionario").value = end.rua || "";
+    document.getElementById("input-numero-end-funcionario").value = end.numero || "";
+    document.getElementById("input-complemento-funcionario").value = end.complemento || "";
+    document.getElementById("input-cargo-funcionario").value = f.cargo || "";
+    document.getElementById("input-salario-funcionario").value = f.salario ?? "";
+    document.getElementById("input-admissao-funcionario").value = f.admissao || "";
+
+    abrirFormularioCadastro(dom.formFuncionarios, dom.tabelaFuncionarios);
+    configurarBotaoFormFuncionario(true);
+}
+
+function salvarFuncionario() {
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+
+    const idEdicao = selecionados.funcionario;
+    if (idEdicao) {
+        const dados = lerCamposFuncionario();
+        if (!dados) return;
+        const f = funcionarios.find(x => x.id === idEdicao);
+        if (f) Object.assign(f, dados);
+        dom.formFuncionarios.reset();
+        fecharFormularioFuncionario();
+        render();
+    } else {
+        cadastrarFuncionario();
+    }
+}
+
+function inativarFuncionario(id) {
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+
+    const f = funcionarios.find(x => x.id === id);
+    if (!f) return;
+
+    const idx = funcionarios.indexOf(f);
+    const vinculado = locacoes.some(l => l.idx_funcionario === idx && (l.status === "Ativo" || l.status === "Reservado"));
+    if (vinculado) {
+        alert(`Não é possível excluir o funcionário "${f.nome}" pois ele está vinculado a uma locação ativa.`);
+        return;
+    }
+
+    if (!confirm(`Tem certeza que deseja excluir o funcionário "${f.nome}"? Ele será inativado e deixará de aparecer no sistema.`)) return;
+
+    f.ativo = false;
+    limparSelecao("funcionario");
+    render();
 }
 
 /*
     FORMULÁRIOS DE CADASTRO (Veículos / Clientes / Funcionários)
 */
 
-function alternarFormulario(form, tabela) {
-    const abrindo = form.style.display !== "block";
-    form.style.display = abrindo ? "block" : "none";
-    tabela.style.display = abrindo ? "none" : "block";
+function abrirFormularioCadastro(form, tabela) {
+    form.style.display = "block";
+    tabela.style.display = "none";
 }
 
 function fecharFormulario(form, tabela) {
@@ -1091,28 +1423,84 @@ function fecharFormulario(form, tabela) {
     if (tabela) tabela.style.display = "block";
 }
 
+function configurarBotaoFormVeiculo(editando) {
+    const btn = document.getElementById("btn-salvar-veiculo");
+    if (btn) btn.textContent = editando ? "Salvar Alterações" : "Cadastrar Veículo";
+}
+
+function configurarBotaoFormCliente(editando) {
+    const btn = document.getElementById("btn-salvar-cliente");
+    if (btn) btn.textContent = editando ? "Salvar Alterações" : "Cadastrar Cliente";
+}
+
+function configurarBotaoFormFuncionario(editando) {
+    const btn = document.getElementById("btn-salvar-funcionario");
+    if (btn) btn.textContent = editando ? "Salvar Alterações" : "Cadastrar Funcionário";
+}
+
 function alternarFormularioVeiculo() {
-    if (dom.formVeiculos) alternarFormulario(dom.formVeiculos, dom.tabelaVeiculos);
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+    if (!dom.formVeiculos) return;
+
+    const abrindo = dom.formVeiculos.style.display !== "block";
+    if (abrindo && selecionados.veiculo) {
+        abrirEdicaoVeiculo(selecionados.veiculo);
+    } else if (abrindo) {
+        dom.formVeiculos.reset();
+        configurarBotaoFormVeiculo(false);
+        abrirFormularioCadastro(dom.formVeiculos, dom.tabelaVeiculos);
+    } else {
+        fecharFormularioVeiculo();
+    }
 }
 
 function fecharFormularioVeiculo() {
     fecharFormulario(dom.formVeiculos, dom.tabelaVeiculos);
+    configurarBotaoFormVeiculo(false);
+    limparSelecao("veiculo");
 }
 
 function alternarFormularioCliente() {
-    if (dom.formClientes) alternarFormulario(dom.formClientes, dom.tabelaClientes);
+    if (!dom.formClientes) return;
+
+    const abrindo = dom.formClientes.style.display !== "block";
+    if (abrindo && selecionados.cliente) {
+        abrirEdicaoCliente(selecionados.cliente);
+    } else if (abrindo) {
+        dom.formClientes.reset();
+        configurarBotaoFormCliente(false);
+        abrirFormularioCadastro(dom.formClientes, dom.tabelaClientes);
+    } else {
+        fecharFormularioCliente();
+    }
 }
 
 function fecharFormularioCliente() {
     fecharFormulario(dom.formClientes, dom.tabelaClientes);
+    configurarBotaoFormCliente(false);
+    limparSelecao("cliente");
 }
 
 function alternarFormularioFuncionario() {
-    if (dom.formFuncionarios) alternarFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
+    if (!usuarioEhGerente()) { alert("Você não tem permissão para esta ação."); return; }
+    if (!dom.formFuncionarios) return;
+
+    const abrindo = dom.formFuncionarios.style.display !== "block";
+    if (abrindo && selecionados.funcionario) {
+        abrirEdicaoFuncionario(selecionados.funcionario);
+    } else if (abrindo) {
+        dom.formFuncionarios.reset();
+        configurarBotaoFormFuncionario(false);
+        abrirFormularioCadastro(dom.formFuncionarios, dom.tabelaFuncionarios);
+    } else {
+        fecharFormularioFuncionario();
+    }
 }
 
 function fecharFormularioFuncionario() {
     fecharFormulario(dom.formFuncionarios, dom.tabelaFuncionarios);
+    configurarBotaoFormFuncionario(false);
+    limparSelecao("funcionario");
 }
 
 /*
@@ -1131,3 +1519,20 @@ function formatarData(iso) {
     const [y, m, d] = iso.split("-");
     return `${d}/${m}/${y}`;
 }
+
+/*
+    RESTAURAÇÃO DE SESSÃO
+*/
+
+(function restaurarSessao() {
+    const salvo = localStorage.getItem("usuarioLogado");
+    if (!salvo) return;
+    try {
+        usuarioLogado = JSON.parse(salvo);
+        dom.loginScreen.style.display = "none";
+        dom.layout.style.display = "flex";
+        init();
+    } catch (e) {
+        localStorage.removeItem("usuarioLogado");
+    }
+})();
