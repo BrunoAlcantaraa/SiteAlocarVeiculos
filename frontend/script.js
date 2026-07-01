@@ -39,67 +39,75 @@ const dom = {
     DADOS
 */
 
-let veiculos = [
-    {
-        id: 1, nome: "Corolla", renavam: "12345678901", marca: "Toyota",
-        ano: 2022, placa: "ABC-1234", img: "resources/veiculos/corolla.png",
-        status: "Disponível", cor: "Branco Pérola", combustivel: "Flex",
-        km_atual: 45000, valor_diario: 180.00, cliente: null, ativo: true
-    },
-    {
-        id: 2, nome: "Civic", renavam: "98765432109", marca: "Honda",
-        ano: 2021, placa: "DEF-5678", img: "resources/veiculos/civic.png",
-        status: "Alugado", cor: "Cinza Metálico", combustivel: "Gasolina",
-        km_atual: 32000, valor_diario: 200.00,
-        cliente: { nome: "Bruno Alcantara", cpf: "123.456.789-01" }, ativo: true
-    },
-    {
-        id: 3, nome: "Duster", renavam: "45678912345", marca: "Renault",
-        ano: 2023, placa: "GHI-9012", img: "resources/veiculos/duster.png",
-        status: "Em manutenção", cor: "Prata", combustivel: "Flex",
-        km_atual: 18000, valor_diario: 220.00, cliente: null, ativo: true
-    }
-];
+let veiculos = [];
 
-let clientes = [
-    {
-        id: 1,
-        nome: "Bruno Alcantara",
-        cpf: "123.456.789-01",
-        email: "bruno@email.com",
-        telefone: "(45) 99999-1111",
-        ativo: true
-    },
-    {
-        id: 2,
-        nome: "Ian Batista",
-        cpf: "234.567.890-12",
-        email: "ian@email.com",
-        telefone: "(45) 99999-2222",
-        ativo: true
-    }
-];
+let clientes = [];
 
-let funcionarios = [
-    { id: 1, nome: "Ana Silva", cpf: "111.222.333-44", email: "ana@email.com", telefone: "(45) 99111-2222", cargo: "Atendente", salario: 2500.00, admissao: "2023-01-15", ativo: true },
-    { id: 2, nome: "Carlos Souza", cpf: "222.333.444-55", email: "carlos@email.com", telefone: "(45) 99333-4444", cargo: "Gerente", salario: 5000.00, admissao: "2022-03-10", ativo: true },
-    { id: 3, nome: "Mariana Costa", cpf: "333.444.555-66", email: "mariana@email.com", telefone: "(45) 99555-6666", cargo: "Atendente", salario: 2500.00, admissao: "2023-06-20", ativo: true }
-];
+let funcionarios = [];
 
-let locacoes = [
-    {
-        id: 1,
-        idx_veiculo: 1,
-        idx_cliente: 0,
-        idx_funcionario: 0,
-        data_saida: "2026-06-25",
-        data_retorno_prevista: "2026-07-02",
-        km_saida: 32000,
-        status: "Ativo",
-        forma_pagamento: "PIX",
-        valor_entrada: 200.00
-    }
-];
+let locacoes = [];
+
+// let veiculos = [
+//     {
+//         id: 1, nome: "Corolla", renavam: "12345678901", marca: "Toyota",
+//         ano: 2022, placa: "ABC-1234", img: "resources/veiculos/corolla.png",
+//         status: "Disponível", cor: "Branco Pérola", combustivel: "Flex",
+//         km_atual: 45000, valor_diario: 180.00, cliente: null, ativo: true
+//     },
+//     {
+//         id: 2, nome: "Civic", renavam: "98765432109", marca: "Honda",
+//         ano: 2021, placa: "DEF-5678", img: "resources/veiculos/civic.png",
+//         status: "Alugado", cor: "Cinza Metálico", combustivel: "Gasolina",
+//         km_atual: 32000, valor_diario: 200.00,
+//         cliente: { nome: "Bruno Alcantara", cpf: "123.456.789-01" }, ativo: true
+//     },
+//     {
+//         id: 3, nome: "Duster", renavam: "45678912345", marca: "Renault",
+//         ano: 2023, placa: "GHI-9012", img: "resources/veiculos/duster.png",
+//         status: "Em manutenção", cor: "Prata", combustivel: "Flex",
+//         km_atual: 18000, valor_diario: 220.00, cliente: null, ativo: true
+//     }
+// ];
+
+// let clientes = [
+//     {
+//         id: 1,
+//         nome: "Bruno Alcantara",
+//         cpf: "123.456.789-01",
+//         email: "bruno@email.com",
+//         telefone: "(45) 99999-1111",
+//         ativo: true
+//     },
+//     {
+//         id: 2,
+//         nome: "Ian Batista",
+//         cpf: "234.567.890-12",
+//         email: "ian@email.com",
+//         telefone: "(45) 99999-2222",
+//         ativo: true
+//     }
+// ];
+
+// let funcionarios = [
+//     { id: 1, nome: "Ana Silva", cpf: "111.222.333-44", email: "ana@email.com", telefone: "(45) 99111-2222", cargo: "Atendente", salario: 2500.00, admissao: "2023-01-15", ativo: true },
+//     { id: 2, nome: "Carlos Souza", cpf: "222.333.444-55", email: "carlos@email.com", telefone: "(45) 99333-4444", cargo: "Gerente", salario: 5000.00, admissao: "2022-03-10", ativo: true },
+//     { id: 3, nome: "Mariana Costa", cpf: "333.444.555-66", email: "mariana@email.com", telefone: "(45) 99555-6666", cargo: "Atendente", salario: 2500.00, admissao: "2023-06-20", ativo: true }
+// ];
+
+// let locacoes = [
+//     {
+//         id: 1,
+//         idx_veiculo: 1,
+//         idx_cliente: 0,
+//         idx_funcionario: 0,
+//         data_saida: "2026-06-25",
+//         data_retorno_prevista: "2026-07-02",
+//         km_saida: 32000,
+//         status: "Ativo",
+//         forma_pagamento: "PIX",
+//         valor_entrada: 200.00
+//     }
+// ];
 
 const estadosCidades = {
     "AC": ["Rio Branco", "Cruzeiro do Sul", "Sena Madureira"],
@@ -296,11 +304,36 @@ function init() {
     mostrarPagina("pag-dashboard");
 }
 
+function carregarVeiculos() {
+    const resposta = fetch("localhost:8000/veiculos");
+    veiculos = await resposta.json();
+}
+
+function carregarClientes() {
+    const resposta = fetch("localhost:8000/clientes");
+    clientes = await resposta.json();
+}
+
+function carregarFuncionarios() {
+    const resposta = fetch("localhost:8000/funcionarios");
+    funcionarios = await resposta.json();
+}
+
+function carregarLocacoes() {
+    const resposta = fetch("localhost:8000/locacoes");
+    locacoes = await resposta.json();
+}
+
 /*
     RENDER
 */
 
 function render() {
+    carregarVeiculos();
+    carregarClientes();
+    carregarFuncionarios();
+    carregarLocacoes();
+
     limparBuscas();
     renderSecaoDisponiveis();
     renderSecaoReservados();
@@ -872,7 +905,7 @@ function validarFormAlocacao() {
     CONFIRMAR ALOCAÇÃO
 */
 
-function confirmarAlocacao(event) {
+async function confirmarAlocacao(event) {
     event.preventDefault();
 
     if (!validarFormAlocacao()) {
@@ -885,38 +918,63 @@ function confirmarAlocacao(event) {
     const idxCliente = parseInt(document.getElementById("alocar-cliente").value, 10);
     const idxFuncionario = parseInt(document.getElementById("alocar-funcionario").value, 10);
     const clienteSel = clientes[idxCliente];
+    const funcionarioSel = funcionarios[idxFuncionario];
     const dataSaida = document.getElementById("alocar-data-saida").value;
     const dataRetorno = document.getElementById("alocar-data-retorno").value;
     const kmSaida = parseInt(document.getElementById("alocar-km-saida").value, 10);
-    const status = document.getElementById("alocar-status").value;
-    const pagamento = document.getElementById("alocar-pagamento").value;
-    const entrada = parseFloat(document.getElementById("alocar-entrada").value) || 0;
 
-    locacoes.push({
-        id: locacoes.length + 1,
-        idx_veiculo: indexVeiculoSelecionado,
-        idx_cliente: idxCliente,
-        idx_funcionario: idxFuncionario,
-        data_saida: dataSaida,
-        data_retorno_prevista: dataRetorno,
-        km_saida: kmSaida,
-        status: status,
-        forma_pagamento: pagamento,
-        valor_entrada: entrada
-    });
+    // Converte índices em identificadores reais para o backend
+    const payload = {
+        placaVeiculo: v.placa,
+        cpfCliente: clienteSel.cpf,
+        cpfFuncionario: funcionarioSel.cpf,
+        dataSaida: dataSaida,
+        dataRetornoPrevista: dataRetorno,
+        kmSaida: kmSaida
+    };
 
-    v.status = "Alugado";
-    v.cliente = clienteSel;
+    try {
+        const resposta = await fetch("http://localhost:8080/locacoes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
 
-    mostrarNotificacao(
-        `Veículo ${v.marca} ${v.nome} alocado com sucesso para ${clienteSel.nome}!`,
-        "sucesso"
-    );
+        if (!resposta.ok) {
+            throw new Error(`Erro na requisição: ${resposta.status}`);
+        }
 
-    setTimeout(() => {
-        render();
-        voltarParaVeiculos();
-    }, 1800);
+        const resultado = await resposta.json();
+        console.log("Locação registrada:", resultado);
+
+        // Registra locação local (usando índices)
+        locacoes.push({
+            id: resultado.idLocacao || locacoes.length + 1,
+            idx_veiculo: indexVeiculoSelecionado,
+            idx_cliente: idxCliente,
+            idx_funcionario: idxFuncionario,
+            data_saida: dataSaida,
+            data_retorno_prevista: dataRetorno,
+            km_saida: kmSaida,
+            status: "Ativo"
+        });
+
+        v.status = "Alugado";
+        v.cliente = clienteSel;
+
+        mostrarNotificacao(
+            `Veículo ${v.marca} ${v.nome} alocado com sucesso para ${clienteSel.nome}!`,
+            "sucesso"
+        );
+
+        setTimeout(() => {
+            render();
+            voltarParaVeiculos();
+        }, 1800);
+    } catch (erro) {
+        console.error("Erro ao alocar veículo:", erro);
+        mostrarNotificacao(`Erro ao alocar veículo: ${erro.message}`, "erro");
+    }
 }
 
 /*
@@ -1059,7 +1117,7 @@ function calcularCustoFinalizacao() {
     document.getElementById("fin-res-total").textContent = "R$ " + formatarMoeda(total);
 }
 
-function confirmarFinalizacao(event) {
+async function confirmarFinalizacao(event) {
     event.preventDefault();
 
     const v = veiculos[indexVeiculoSelecionado];
@@ -1096,19 +1154,45 @@ function confirmarFinalizacao(event) {
         return;
     }
 
-    v.status = "Disponível";
-    v.cliente = null;
-    v.km_atual = kmVal;
+    try {
+        // Envia dados para o backend finalizar a locação
+        const payloadFinalizacao = {
+            id: locacao.id,
+            DataRetorno: dataRetornoReal,
+            kms: kmVal
+        };
 
-    const locIdx = locacoes.findIndex(l => l.idx_veiculo === indexVeiculoSelecionado);
-    if (locIdx !== -1) locacoes.splice(locIdx, 1);
+        const resposta = await fetch(`http://localhost:8080/locacoes/${locacao.id}/concluir`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payloadFinalizacao)
+        });
 
-    mostrarNotificacaoFinalizar(`Locação do ${v.marca} ${v.nome} finalizada com sucesso!`, "sucesso");
+        if (!resposta.ok) {
+            throw new Error(`Erro na requisição: ${resposta.status}`);
+        }
 
-    setTimeout(() => {
-        render();
-        voltarParaVeiculos();
-    }, 1800);
+        const resultado = await resposta.json();
+        console.log("Locação finalizada:", resultado);
+
+        // Atualiza estado local
+        v.status = "Disponível";
+        v.cliente = null;
+        v.km_atual = kmVal;
+
+        const locIdx = locacoes.findIndex(l => l.idx_veiculo === indexVeiculoSelecionado);
+        if (locIdx !== -1) locacoes.splice(locIdx, 1);
+
+        mostrarNotificacaoFinalizar(`Locação do ${v.marca} ${v.nome} finalizada com sucesso!`, "sucesso");
+
+        setTimeout(() => {
+            render();
+            voltarParaVeiculos();
+        }, 1800);
+    } catch (erro) {
+        console.error("Erro ao finalizar locação:", erro);
+        mostrarNotificacaoFinalizar(`Erro ao finalizar locação: ${erro.message}`, "erro");
+    }
 }
 
 /*
@@ -1145,7 +1229,14 @@ function cadastrarVeiculo() {
     const dados = lerCamposVeiculo();
     if (!dados) return;
 
-    veiculos.push({ id: proximoId(veiculos), ativo: true, cliente: null, ...dados });
+    const resposta = await fetch("https://api.veiculos.com/cadastrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await resposta.json();
+    console.log("Veículo cadastrado:", resultado);
 
     dom.formVeiculos.reset();
     fecharFormularioVeiculo();
@@ -1237,6 +1328,15 @@ function lerCamposCliente() {
 function cadastrarCliente() {
     const dados = lerCamposCliente();
     if (!dados) return;
+
+    const resposta = await fetch("https://api.clientes.com/cadastrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await resposta.json();
+    console.log("Cliente cadastrado:", resultado);
 
     clientes.push({ id: proximoId(clientes), ativo: true, ...dados });
 
@@ -1337,6 +1437,15 @@ function lerCamposFuncionario() {
 function cadastrarFuncionario() {
     const dados = lerCamposFuncionario();
     if (!dados) return;
+
+    const resposta = await fetch("https://api.funcionarios.com/cadastrar", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dados)
+    });
+
+    const resultado = await resposta.json();
+    console.log("Funcionário cadastrado:", resultado);
 
     funcionarios.push({ id: proximoId(funcionarios), ativo: true, ...dados });
 
