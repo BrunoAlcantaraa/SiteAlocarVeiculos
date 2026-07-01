@@ -34,19 +34,21 @@ public class FuncionarioService {
         return true;
     }
 
-    public boolean verificaSenha(String user, String senha) {
-        Funcionario funcionario = funcionarioRepository.findByUsername(user);
+    public boolean verificaSenha(LoginDTO dto) {
+        Funcionario funcionario = funcionarioRepository.findByUsername(dto.getUsername());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if(funcionario == null) {
             return false;
         }
 
-        return encoder.matches(senha, funcionario.getSenhaHash());
+        return encoder.matches(dto.getSenha(), funcionario.getSenhaHash());
     }
 
-    public void Cadastrar(FuncionarioCadastroDTO funcDto, EnderecoCadastroDTO enderecoDto, PessoaCadastroDTO pesDto) {
-        if (!VerificarPermissao(funcDto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
+    public void Cadastrar(FuncionarioCadastroDTO dto) {
+        if (!VerificarPermissao(dto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
+        PessoaCadastroDTO pesDto = dto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = dto.getEndereco();
 
         Pessoa pessoa = new Pessoa();
 
@@ -58,24 +60,24 @@ public class FuncionarioService {
             pessoa = pessoaService.Cadastro(pesDto, enderecoDto);
         }
 
-            Cargo cargo = cargoRepository.findByNome(funcDto.getCargo()); //pesquisa o cargo
+            Cargo cargo = cargoRepository.findByNome(dto.getCargo()); //pesquisa o cargo
             Funcionario funcionario = new Funcionario();
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-            String senhaCript = encoder.encode(funcDto.getSenha()); //criptografa a senha
+            String senhaCript = encoder.encode(dto.getSenha()); //criptografa a senha
             funcionario.setPessoa(pessoa);
-            funcionario.setSalario(funcDto.getSalario());
-            funcionario.setUsername(funcDto.getUsername());
+            funcionario.setSalario(dto.getSalario());
+            funcionario.setUsername(dto.getUsername());
             funcionario.setSenhaHash(senhaCript);
             funcionario.setCargo(cargo);
             funcionarioRepository.save(funcionario); //da insert
         }
 
-    public void Editar(FuncionarioEdicaoDTO funcDto,
-                       EnderecoCadastroDTO enderecoDto,
-                       PessoaEdicaoDTO pesDto,
-                       TelefoneEdicaoDTO telefoneDto) {
-
+    public void Editar(FuncionarioEdicaoDTO funcDto) {
         if(!VerificarPermissao(funcDto.getIdFuncLogado())) throw new AutorizacaoNegada("Ação não autorizada");
+
+        PessoaEdicaoDTO pesDto = funcDto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = funcDto.getEndereco();
+        TelefoneEdicaoDTO telefoneDto = funcDto.getTelefone();
 
         Optional<Funcionario> func =  funcionarioRepository.findById(funcDto.getIdFunc());
 

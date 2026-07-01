@@ -1,5 +1,6 @@
 package service;
 
+import dto.AdicionarValorDTO;
 import dto.CobrancaPlusCadastro;
 import dto.PagamentoCadastroDTO;
 import dto.PagamentoCadastroPosteriorDTO;
@@ -93,14 +94,15 @@ public class PagamentoService {
         pagamentoRepository.save(pagamento);
     }
 
-    public void AdicionarValor(Long id, CobrancaPlusCadastro dto){
-        Optional<Pagamento> pagamento = pagamentoRepository.findById(id);
+    public void AdicionarValor(AdicionarValorDTO dto){
+        CobrancaPlusCadastro CPC = dto.getCPC();
+        Optional<Pagamento> pagamento = pagamentoRepository.findById(CPC.getIdLocacao());
 
         if(pagamento.isPresent()){
-            cobrancaPlusService.Cadastro(dto);
+            cobrancaPlusService.Cadastro(CPC);
 
             BigDecimal valorAtual = pagamento.get().getValorPagamento();
-            BigDecimal valorNovo = valorAtual.add(dto.getValor());
+            BigDecimal valorNovo = valorAtual.add(CPC.getValor());
             pagamento.get().setValorPagamento(valorNovo);
             pagamentoRepository.save(pagamento.get());
         }

@@ -1,8 +1,6 @@
 package service;
 
-import dto.PessoaCadastroDTO;
-import dto.PessoaEdicaoDTO;
-import dto.TelefoneEdicaoDTO;
+import dto.*;
 import entity.Cliente;
 import entity.Pessoa;
 import exception.DadosInvalidos;
@@ -10,7 +8,6 @@ import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
-import dto.EnderecoCadastroDTO;
 
 import java.util.Optional;
 
@@ -26,8 +23,11 @@ public class ClienteService {
     private final EnderecoRepository enderecoRepository;
     private PessoaService pessoaService;
 
-    public void Cadastrar(PessoaCadastroDTO pesDto, EnderecoCadastroDTO enderecoDto){
+    public void Cadastrar(ClienteCadastroDTO dto) {
         Pessoa pessoa = new Pessoa();
+
+        PessoaCadastroDTO pesDto = dto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = dto.getEndereco();
 
         if(funcionarioRepository.findByPessoaCPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf());
@@ -42,8 +42,12 @@ public class ClienteService {
         clienteRepository.save(cliente); //da o insert
     }
 
-    public void Editar(Long id, PessoaEdicaoDTO pesDto, EnderecoCadastroDTO enderecoDto, TelefoneEdicaoDTO telefoneDto){
-        Optional<Cliente> cliente = clienteRepository.findById(id);
+    public void Editar(ClienteEdicaoDTO dto) {
+        PessoaEdicaoDTO pesDto = dto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = dto.getEndereco();
+        TelefoneEdicaoDTO telefoneDto = dto.getTelefone();
+
+        Optional<Cliente> cliente = clienteRepository.findById(dto.getId());
 
         if(cliente.isPresent()){
             Pessoa pes = cliente.get().getPessoa();
