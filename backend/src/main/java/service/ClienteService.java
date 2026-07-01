@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -22,6 +23,19 @@ public class ClienteService {
     private final FuncionarioRepository funcionarioRepository;
     private final EnderecoRepository enderecoRepository;
     private PessoaService pessoaService;
+    private EnderecoService enderecoService;
+
+    public ClienteRetornoDTO ConverterParaDTO(Cliente cliente){
+        ClienteRetornoDTO dto = new ClienteRetornoDTO();
+        PessoaRetornoDTO pesDto = pessoaService.ConverterParaDto(cliente.getPessoa());
+        EnderecoCadastroDTO endrDto = enderecoService.ConverterParaDTO(cliente.getPessoa().getEndereco());
+
+        dto.setPessoaDTO(pesDto);
+        dto.setEnderecoDTO(endrDto);
+        dto.setTelefones(telefoneRepository.findAll());
+
+        return dto;
+    }
 
     public void Cadastrar(ClienteCadastroDTO dto) {
         Pessoa pessoa = new Pessoa();
@@ -55,5 +69,11 @@ public class ClienteService {
         }else{
             throw new RecursoNaoEncontrado("Cliente não encontrado");
         }
+    }
+
+    public List<ClienteRetornoDTO> Listar(){
+        List<Cliente> clientes =  clienteRepository.findAll();
+
+        return clientes.stream().map(this::ConverterParaDTO).toList();
     }
 }
