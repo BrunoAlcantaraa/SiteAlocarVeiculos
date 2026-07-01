@@ -1,11 +1,14 @@
 package service;
 
-import dto.EnderecoCadastroDTO;
-import dto.FuncionarioCadastroDTO;
+import dto.*;
 import entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
+
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,53 +16,82 @@ public class FuncionarioService {
     //declaração dos repositorios
 
     private final FuncionarioRepository funcionarioRepository;
-    private final EnderecoRepository enderecoRepository;
     private final PessoaRepository pessoaRepository;
     private final ClienteRepository clienteRepository;
-    private final TelefoneRepository telefoneRepository;
     private final CargoRepository cargoRepository;
-    private EnderecoService enderecoService;
+    private PessoaService pessoaService;
 
-    public void Cadastrar(FuncionarioCadastroDTO funcDto, EnderecoCadastroDTO enderecoDto) {
-        Pessoa pessoa = new Pessoa();
+    public boolean VerificarPermissao(Long id){
+        Optional<Funcionario> funcionarioLogado = funcionarioRepository.findById(id);
 
-        if(clienteRepository.findByPessoaCPF(funcDto.getCpf()) != null){
-            pessoa = pessoaRepository.findByCPF(funcDto.getCpf()); //impede que o código tente duplicar a pessoa
-        }else{ //caso não seja um cliente
-            Endereco endereco = enderecoService.cadastrar(enderecoDto); //da insert no endereco e retorna para usar como FK
-
-            //salva todas as informações básicas
-            pessoa.setNomePessoa(funcDto.getNome());
-            pessoa.setCPF(funcDto.getCpf());
-            pessoa.setEmail(funcDto.getEmail());
-            pessoa.setDataNascimento(funcDto.getDataNascimento());
-            pessoa.setEndereco(endereco);
-
-            String Sexo = funcDto.getSexo(); //só para não ficar copiando o getsexo
-
-            //converte o valor de sexo para boolean
-            if (Sexo == null) {
-                pessoa.setSexo(null); //opção: prefiro não responder
-            } else if (Sexo.equals("M")) {
-                pessoa.setSexo(true); //opção: masculino
-            } else if (Sexo.equals("F")) {
-                pessoa.setSexo(false); //opção: feminino
+        if(funcionarioLogado.isPresent()) {
+            if(!funcionarioLogado.get().getCargo().getNomeCargo().equals("Gerente")){
+                return false;
             }
+        }
+        return true;
+    }
 
-            pessoaRepository.save(pessoa); //da insert
+    public boolean verificaSenha(String user, String senha) {
+        Funcionario funcionario = funcionarioRepository.findByUsername(user);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if(funcionario == null) {
+            return false;
         }
 
-        //faz o cadastro do telefone
-        Telefone telefone = new Telefone();
-        telefone.setNumeroTel(funcDto.getTelefone());
-        telefone.setPessoa(pessoa);
-        telefoneRepository.save(telefone); //da insert
+        return encoder.matches(senha, funcionario.getSenhaHash());
+    }
 
-        Cargo cargo = cargoRepository.findByNome(funcDto.getCargo()); //pesquisa o cargo
+    public void Cadastrar(FuncionarioCadastroDTO funcDto, EnderecoCadastroDTO enderecoDto, PessoaCadastroDTO pesDto) {
+        if (!VerificarPermissao(funcDto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
 
-        Funcionario funcionario = new Funcionario();
-        funcionario.setPessoa(pessoa);
-        funcionario.setSalario(funcDto.getSalario());
-        funcionario.setCargo(cargo);
+        Pessoa pessoa = new Pessoa();
+
+        if (clienteRepository.findByPessoaCPF(pesDto.getCpf()) != null) {
+            pessoa = pessoaRepository.findByCPF(pesDto.getCpf()); //impede que o código tente duplicar a pessoa
+        } else { //caso não seja um cliente
+            if(!pessoaService.VerificarDados(pesDto.getCpf(),
+                    pesDto.getEmail(),
+                    pesDto.getDataNascimento()))
+                throw new RuntimeException("Algum dado (Cpf,Email ou Data de nascimento, está inválido");
+
+            pessoa = pessoaService.Cadastro(pesDto, enderecoDto);
+        }
+
+            Cargo cargo = cargoRepository.findByNome(funcDto.getCargo()); //pesquisa o cargo
+            Funcionario funcionario = new Funcionario();
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String senhaCript = encoder.encode(funcDto.getSenha()); //criptografa a senha
+            funcionario.setPessoa(pessoa);
+            funcionario.setSalario(funcDto.getSalario());
+            funcionario.setUsername(funcDto.getUsername());
+            funcionario.setSenhaHash(senhaCript);
+            funcionario.setCargo(cargo);
+            funcionarioRepository.save(funcionario); //da insert
+        }
+
+    public void Editar(FuncionarioEdicaoDTO funcDto,
+                       EnderecoCadastroDTO enderecoDto,
+                       PessoaEdicaoDTO pesDto,
+                       TelefoneEdicaoDTO telefoneDto) {
+
+        if(!VerificarPermissao(funcDto.getIdFuncLogado())) throw new RuntimeException("Ação não autorizada");
+
+        Optional<Funcionario> func =  funcionarioRepository.findById(funcDto.getIdFunc());
+
+        if(func.isPresent()) {
+            Pessoa pes = func.get().getPessoa();
+            pessoaService.Edicao(pes,pesDto,enderecoDto,telefoneDto); //atualiza as informações de pessoa
+
+            BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+            String senhaHash = encoder.encode(funcDto.getSenha());
+            Cargo cargo = cargoRepository.findByNome(funcDto.getCargo());
+            func.get().setSalario(funcDto.getSalario());
+            func.get().setUsername(funcDto.getUsername());
+            func.get().setSenhaHash(senhaHash);
+            func.get().setCargo(cargo);
+            funcionarioRepository.save(func.get()); //da update
+        }
     }
 }

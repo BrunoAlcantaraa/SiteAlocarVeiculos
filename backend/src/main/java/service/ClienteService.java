@@ -1,14 +1,16 @@
 package service;
 
+import dto.PessoaCadastroDTO;
+import dto.PessoaEdicaoDTO;
+import dto.TelefoneEdicaoDTO;
 import entity.Cliente;
-import entity.Endereco;
 import entity.Pessoa;
-import entity.Telefone;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
-import dto.ClienteCadastroDTO;
 import dto.EnderecoCadastroDTO;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -20,52 +22,35 @@ public class ClienteService {
     private final PessoaRepository pessoaRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final EnderecoRepository enderecoRepository;
-    private EnderecoService enderecoService;
+    private PessoaService pessoaService;
 
-    public boolean VerificarDados(ClienteCadastroDTO dto){ //verificar se vai ser necessário
-
-        return true;
-    }
-
-    public void Cadastrar(ClienteCadastroDTO clienteDto, EnderecoCadastroDTO enderecoDto){
+    public void Cadastrar(PessoaCadastroDTO pesDto, EnderecoCadastroDTO enderecoDto){
         Pessoa pessoa = new Pessoa();
 
-        if(funcionarioRepository.findByPessoaCPF(clienteDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
-            pessoa = pessoaRepository.findByCPF(clienteDto.getCpf());
-
+        if(funcionarioRepository.findByPessoaCPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
+            pessoa = pessoaRepository.findByCPF(pesDto.getCpf());
         }else { //caso não seja um funcionário, segue o fluxo normal
+            if(!pessoaService.VerificarDados(pesDto.getCpf(),
+                    pesDto.getEmail(),
+                    pesDto.getDataNascimento()))
+                throw new RuntimeException("Algum dado (cpf, email ou data de nascimento) estão inválidos");
 
-            Endereco endereco = enderecoService.cadastrar(enderecoDto); //da insert no endereco e retorna para usar como FK
-
-            //salva todas as informações básicas
-            pessoa.setNomePessoa(clienteDto.getNome());
-            pessoa.setCPF(clienteDto.getCpf());
-            pessoa.setEmail(clienteDto.getEmail());
-            pessoa.setDataNascimento(clienteDto.getDataNascimento());
-            pessoa.setEndereco(endereco);
-
-            String Sexo = clienteDto.getSexo(); //só para não ficar copiando o getsexo
-
-            //converte o valor de sexo para boolean
-            if (Sexo == null) {
-                pessoa.setSexo(null); //opção: prefiro não responder
-            } else if (Sexo.equals("M")) {
-                pessoa.setSexo(true); //opção: masculino
-            } else if (Sexo.equals("F")) {
-                pessoa.setSexo(false); //opção: feminino
-            }
-
-            pessoaRepository.save(pessoa); //da insert
+            pessoa = pessoaService.Cadastro(pesDto,enderecoDto);
         }
-
-        //faz o cadastro do telefone
-        Telefone telefone = new Telefone();
-        telefone.setNumeroTel(clienteDto.getTelefone());
-        telefone.setPessoa(pessoa);
-        telefoneRepository.save(telefone); //da insert
 
         Cliente cliente = new Cliente();
         cliente.setPessoa(pessoa); //define a fk de cliente
         clienteRepository.save(cliente); //da o insert
+    }
+
+    public void Editar(Long id, PessoaEdicaoDTO pesDto, EnderecoCadastroDTO enderecoDto, TelefoneEdicaoDTO telefoneDto){
+        Optional<Cliente> cliente = clienteRepository.findById(id);
+
+        if(cliente.isPresent()){
+            Pessoa pes = cliente.get().getPessoa();
+            pessoaService.Edicao(pes,pesDto,enderecoDto,telefoneDto);
+        }else{
+            throw new RuntimeException("Cliente não encontrado");
+        }
     }
 }

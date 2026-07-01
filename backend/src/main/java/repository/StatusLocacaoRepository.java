@@ -6,4 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StatusLocacaoRepository   extends JpaRepository<StatusLocacao,Long> {
+    StatusLocacao findByNome(String nome);
 }

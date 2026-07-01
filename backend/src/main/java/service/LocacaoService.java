@@ -1,9 +1,15 @@
 package service;
 
 import dto.LocacaoCadastroDTO;
+import dto.LocacaoConclusaoDTO;
+import dto.LocacaoEdicaoDTO;
+import entity.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
+
+import java.util.Optional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -14,8 +20,109 @@ public class LocacaoService {
     private final LocacaoRepository locacaoRepository;
     private final StatusLocacaoRepository statusLocacaoRepository;
     private final FuncionarioRepository funcionarioRepository;
+    private final StatusVeiculoRepository statusVeiculoRepository;
+
+    private FuncionarioService funcionarioService;
 
     public void Cadastro(LocacaoCadastroDTO dto) {
+        Locacao locacao = new Locacao();
+        Cliente cliente = clienteRepository.findByPessoaCPF(dto.getCpfCliente());
+        Funcionario func = funcionarioRepository.findByPessoaCPF(dto.getCpfFuncionario());
+        Veiculo veiculo = veiculoRepository.findByPlaca(dto.getPlacaVeiculo());
+        StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Em Aberto");
 
+        if (veiculo == null){
+            throw new RuntimeException("Veiculo não encontrado, verifique a placa digitada e tente novamente");
+        }else if(cliente == null){
+            throw new RuntimeException("Cliente não encontrado, verifique os dados informados");
+        }else if(func == null){
+            throw new RuntimeException("Funcionário não encontrado, verifique os dados informados");
+        }
+
+        //assinala os atributos
+        locacao.setDataSaida(dto.getDataSaida());
+        locacao.setDataRetornoPrevisto(dto.getDataRetornoPrevista());
+        locacao.setKmsSaida(dto.getKmSaida());
+        locacao.setVeiculo(veiculo);
+        locacao.setCliente(cliente);
+        locacao.setFuncionario(func);
+        locacao.setStatusLocacao(statusLocacao);
+        locacaoRepository.save(locacao); //da insert
+
+        StatusVeiculo statusVeiculo = statusVeiculoRepository.findByNome("Alugado");
+        veiculo.setStatusVeiculo(statusVeiculo); //atualiza o status do veiculo
+        veiculoRepository.save(veiculo); //da update no veiculo
+    }
+
+    public void Concluir(LocacaoConclusaoDTO dto) {
+        Optional<Locacao> locacao = locacaoRepository.findById(dto.getId());
+
+        if (locacao.isPresent()) {
+            if(locacao.get().getKmsSaida() > dto.getKms()){ //verifica se a kilometragem de retorno é menor que a de saida
+                throw new RuntimeException("Kilometragem de retorno errada, verifique e tente novamente");
+            }else if(locacao.get().getDataSaida().isAfter(dto.getDataRetorno())){ //verifica se a data de retorno é anterior a de saida
+                throw new RuntimeException("Data de retorno inválida,  verifique os dados informados e tente novamente");
+            }
+
+            StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Finalizada");
+
+            locacao.get().setKmsRetorno(dto.getKms());
+            locacao.get().setDataRetornoReal(dto.getDataRetorno());
+            locacao.get().setStatusLocacao(statusLocacao); //atualiza o status
+            locacaoRepository.save(locacao.get()); //da update
+
+            Veiculo veiculo = locacao.get().getVeiculo();
+            StatusVeiculo status = statusVeiculoRepository.findByNome("Disponível");
+            veiculo.setStatusVeiculo(status); //atualiza o status do veiculo
+            veiculo.setKmsAtual(dto.getKms()); //atualiza a kilometragem do carro
+            veiculoRepository.save(veiculo); //da update
+        }else{
+            throw new RuntimeException("Locacao não encontrada, verifica o id ai brunin");
+        }
+    }
+
+    public void Editar(LocacaoEdicaoDTO dto){
+        if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
+
+        Optional<Locacao> locacao = locacaoRepository.findById(dto.getId());
+        Veiculo veiculoAntigo = new Veiculo();
+
+        if (locacao.isPresent()) {
+            if(locacao.get().getStatusLocacao().getNomeStatusLocacao().equals("Finalizada")){
+                throw new RuntimeException("Locação já finalizada, não é possível editar locações finalizadas");
+            }
+
+            Veiculo veiculo = veiculoRepository.findByPlaca(dto.getPlacaVeiculo());
+            if (!veiculo.getPlaca().equals(locacao.get().getVeiculo().getPlaca())) { //caso seja um carro diferente, vaia tualizar os status de cada
+                veiculoAntigo = locacao.get().getVeiculo();
+                veiculoAntigo.setStatusVeiculo(statusVeiculoRepository.findByNome("Disponível")); //atualiza o status
+                veiculoRepository.save(veiculoAntigo); //da update
+            }
+
+            //atualiza os valores
+            locacao.get().setDataSaida(dto.getDataSaida());
+            locacao.get().setDataRetornoPrevisto(dto.getDataRetornoPrevista());
+            locacao.get().setKmsSaida(dto.getKms());
+            locacao.get().setVeiculo(veiculo);
+            locacaoRepository.save(locacao.get()); //da update
+
+            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNome("Alugado"));
+            veiculoRepository.save(veiculo); //da update
+        }else{
+            throw new RuntimeException("Locacao não encontrada, verifica o id ai brunin");
+        }
+    }
+
+    public void Cancelar(Long id){
+        Optional<Locacao> locacao = locacaoRepository.findById(id);
+
+        if(locacao.isPresent()){
+            Veiculo veiculo = locacao.get().getVeiculo();
+            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNome("Disponível")); //atualiza o status do carro
+            veiculoRepository.save(veiculo); //da update
+            locacaoRepository.deleteById(id); //da delete
+        }else{
+            throw new RuntimeException("Locacao não encontrada, verificar id");
+        }
     }
 }

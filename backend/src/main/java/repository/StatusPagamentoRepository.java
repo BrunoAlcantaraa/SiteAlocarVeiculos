@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StatusPagamentoRepository extends JpaRepository<StatusPagamento,Long> {
+    StatusPagamento findByNome(String nome);
+    StatusPagamento findByFormaPagamento(String formaPagamento);
 }

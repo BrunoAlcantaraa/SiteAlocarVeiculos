@@ -10,6 +10,8 @@ import repository.EnderecoRepository;
 import repository.CidadeRepository;
 import repository.EstadoRepository;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class EnderecoService {
@@ -29,6 +31,22 @@ public class EnderecoService {
         endereco.setCEP(dto.getCep());
         endereco.setComplemento(dto.getComplemento());
         endereco.setCidade(cidade); //FK
+
+        enderecoRepository.save(endereco); //da o insert
+        return endereco; //retorna para o cliente service
+    }
+
+    public Endereco Editar(Endereco endereco, EnderecoCadastroDTO dto) {
+        Estado estado = estadoRepository.findByNome(dto.getEstado());
+        Cidade cid = cidadeRepository.findByNomeAndEstate(dto.getCidade(),estado);
+
+        //definição dos atributos
+        endereco.setRua(dto.getRua());
+        endereco.setNumero(dto.getNumero());
+        endereco.setBairro(dto.getBairro());
+        endereco.setCEP(dto.getCep());
+        endereco.setComplemento(dto.getComplemento());
+        endereco.setCidade(cid); //FK
 
         enderecoRepository.save(endereco); //da o insert
         return endereco; //retorna para o cliente service

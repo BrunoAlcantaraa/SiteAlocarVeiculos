@@ -23,6 +23,11 @@ public class Funcionario {
 
     private BigDecimal salario;
 
+    private String username;
+
+    @Column(name = "senha_hash")
+    private String senhaHash;
+
     @ManyToOne
     @JoinColumn(name = "id_pes_func")
     private Pessoa pessoa;

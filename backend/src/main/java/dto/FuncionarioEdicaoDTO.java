@@ -6,9 +6,10 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Getter
 @Setter
-public class FuncionarioCadastroDTO {
+@Getter
+public class FuncionarioEdicaoDTO {
+    private Long idFuncLogado;
     private Long idFunc;
     private BigDecimal salario;
     private String cargo;

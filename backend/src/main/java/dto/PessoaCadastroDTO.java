@@ -7,7 +7,7 @@ import java.time.LocalDate;
 
 @Setter
 @Getter
-public class ClienteCadastroDTO {
+public class PessoaCadastroDTO {
     private String nome;
     private String cpf;
     private LocalDate dataNascimento;

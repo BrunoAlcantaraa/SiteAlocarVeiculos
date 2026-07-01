@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "locacao")
@@ -51,4 +52,8 @@ public class Locacao {
     @ManyToOne
     @JoinColumn(name = "id_status_locacao")
     private StatusLocacao statusLocacao;
+
+    @OneToMany(mappedBy = "locacao")
+    private List<CobrancaAdicional> cobrancaPlus;
+
 }
