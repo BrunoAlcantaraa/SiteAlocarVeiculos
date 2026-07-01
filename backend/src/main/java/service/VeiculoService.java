@@ -3,6 +3,8 @@ package service;
 import dto.VeiculoCadastroDTO;
 import dto.VeiculoEdicaoDTO;
 import entity.*;
+import exception.AutorizacaoNegada;
+import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
@@ -24,7 +26,7 @@ public class VeiculoService {
     private FuncionarioService funcionarioService;
 
     public void Cadastro(VeiculoCadastroDTO dto){
-        if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
+        if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
         Marca marca = new Marca();
         Modelo modelo = new Modelo();
 
@@ -64,7 +66,7 @@ public class VeiculoService {
     }
 
     public void Editar(VeiculoEdicaoDTO dto){
-        if(funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
+        if(funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
 
         Optional<Veiculo> veiculo = veiculoRepository.findById(dto.getIdVeiculo());
 
@@ -80,7 +82,7 @@ public class VeiculoService {
             veiculoRepository.save(veiculo.get());
 
         }else{
-            throw new RuntimeException("Veiculo não encontrado, verifique o id");
+            throw new RecursoNaoEncontrado("Veiculo não encontrado, verifique o id");
         }
     }
 

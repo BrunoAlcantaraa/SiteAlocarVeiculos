@@ -7,6 +7,8 @@ import entity.CobrancaAdicional;
 import entity.Locacao;
 import entity.Pagamento;
 import entity.StatusPagamento;
+import exception.AcaoInvalida;
+import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.CobrancaAdicionalRepository;
@@ -31,7 +33,7 @@ public class PagamentoService {
         Optional<Locacao> locacao = locacaoRepository.findById(idLocacao);
 
         if(locacao.isPresent()){
-            if(!locacao.get().getStatusLocacao().getNomeStatusLocacao().equals("Finalizada")) throw new RuntimeException("Locação ainda não finalizada");
+            if(!locacao.get().getStatusLocacao().getNomeStatusLocacao().equals("Finalizada")) throw new AcaoInvalida("Locação ainda não finalizada");
             long dias = ChronoUnit.DAYS.between(
                     locacao.get().getDataSaida(),
                     locacao.get().getDataRetornoReal()
@@ -61,7 +63,7 @@ public class PagamentoService {
         BigDecimal ValorFinal;
 
         ValorFinal = CalcularValorFinal(dto.getIdLocacao());
-        if(ValorFinal == null) throw new RuntimeException("Locacao não encontrada");
+        if(ValorFinal == null) throw new RecursoNaoEncontrado("Locacao não encontrada");
 
         Optional<Locacao> locacao = locacaoRepository.findById(dto.getIdLocacao());
         StatusPagamento statusPagamento = statusPagamentoRepository.findByNome("Em aberto");
@@ -78,7 +80,7 @@ public class PagamentoService {
         BigDecimal ValorFinal;
 
         ValorFinal = CalcularValorFinal(dto.getIdLocacao());
-        if(ValorFinal == null) throw new RuntimeException("Locacao não encontrada");
+        if(ValorFinal == null) throw new RecursoNaoEncontrado("Locacao não encontrada");
 
         Optional<Locacao> locacao = locacaoRepository.findById(dto.getIdLocacao());
         StatusPagamento statusPagamento = statusPagamentoRepository.findByNome("Pago");

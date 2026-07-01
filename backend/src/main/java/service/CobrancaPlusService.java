@@ -3,6 +3,7 @@ package service;
 import dto.CobrancaPlusCadastro;
 import entity.CobrancaAdicional;
 import entity.Locacao;
+import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.CobrancaAdicionalRepository;
@@ -26,7 +27,7 @@ public class CobrancaPlusService {
             plus.setLocacao(locacao.get());
             cobrancaAdicionalRepository.save(plus);
         }else{
-            throw new RuntimeException("Locacao não encontrada");
+            throw new RecursoNaoEncontrado("Locacao não encontrada");
         }
     }
 

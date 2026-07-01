@@ -2,6 +2,8 @@ package service;
 
 import dto.*;
 import entity.*;
+import exception.AutorizacaoNegada;
+import exception.DadosInvalidos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
@@ -44,17 +46,14 @@ public class FuncionarioService {
     }
 
     public void Cadastrar(FuncionarioCadastroDTO funcDto, EnderecoCadastroDTO enderecoDto, PessoaCadastroDTO pesDto) {
-        if (!VerificarPermissao(funcDto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
+        if (!VerificarPermissao(funcDto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
 
         Pessoa pessoa = new Pessoa();
 
         if (clienteRepository.findByPessoaCPF(pesDto.getCpf()) != null) {
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf()); //impede que o código tente duplicar a pessoa
         } else { //caso não seja um cliente
-            if(!pessoaService.VerificarDados(pesDto.getCpf(),
-                    pesDto.getEmail(),
-                    pesDto.getDataNascimento()))
-                throw new RuntimeException("Algum dado (Cpf,Email ou Data de nascimento, está inválido");
+            pessoaService.VerificarDados(pesDto.getCpf(),pesDto.getEmail(),pesDto.getDataNascimento());
 
             pessoa = pessoaService.Cadastro(pesDto, enderecoDto);
         }
@@ -76,7 +75,7 @@ public class FuncionarioService {
                        PessoaEdicaoDTO pesDto,
                        TelefoneEdicaoDTO telefoneDto) {
 
-        if(!VerificarPermissao(funcDto.getIdFuncLogado())) throw new RuntimeException("Ação não autorizada");
+        if(!VerificarPermissao(funcDto.getIdFuncLogado())) throw new AutorizacaoNegada("Ação não autorizada");
 
         Optional<Funcionario> func =  funcionarioRepository.findById(funcDto.getIdFunc());
 

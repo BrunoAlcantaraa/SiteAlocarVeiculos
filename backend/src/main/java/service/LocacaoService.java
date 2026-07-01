@@ -4,6 +4,10 @@ import dto.LocacaoCadastroDTO;
 import dto.LocacaoConclusaoDTO;
 import dto.LocacaoEdicaoDTO;
 import entity.*;
+import exception.AcaoInvalida;
+import exception.AutorizacaoNegada;
+import exception.DadosInvalidos;
+import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
@@ -32,11 +36,11 @@ public class LocacaoService {
         StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Em Aberto");
 
         if (veiculo == null){
-            throw new RuntimeException("Veiculo não encontrado, verifique a placa digitada e tente novamente");
+            throw new RecursoNaoEncontrado("Veiculo não encontrado, verifique a placa digitada e tente novamente");
         }else if(cliente == null){
-            throw new RuntimeException("Cliente não encontrado, verifique os dados informados");
+            throw new RecursoNaoEncontrado("Cliente não encontrado, verifique os dados informados");
         }else if(func == null){
-            throw new RuntimeException("Funcionário não encontrado, verifique os dados informados");
+            throw new RecursoNaoEncontrado("Funcionário não encontrado, verifique os dados informados");
         }
 
         //assinala os atributos
@@ -59,9 +63,9 @@ public class LocacaoService {
 
         if (locacao.isPresent()) {
             if(locacao.get().getKmsSaida() > dto.getKms()){ //verifica se a kilometragem de retorno é menor que a de saida
-                throw new RuntimeException("Kilometragem de retorno errada, verifique e tente novamente");
+                throw new DadosInvalidos("Kilometragem de retorno errada, verifique e tente novamente");
             }else if(locacao.get().getDataSaida().isAfter(dto.getDataRetorno())){ //verifica se a data de retorno é anterior a de saida
-                throw new RuntimeException("Data de retorno inválida,  verifique os dados informados e tente novamente");
+                throw new DadosInvalidos("Data de retorno inválida,  verifique os dados informados e tente novamente");
             }
 
             StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Finalizada");
@@ -77,19 +81,19 @@ public class LocacaoService {
             veiculo.setKmsAtual(dto.getKms()); //atualiza a kilometragem do carro
             veiculoRepository.save(veiculo); //da update
         }else{
-            throw new RuntimeException("Locacao não encontrada, verifica o id ai brunin");
+            throw new RecursoNaoEncontrado("Locacao não encontrada, verifica o id ai brunin");
         }
     }
 
     public void Editar(LocacaoEdicaoDTO dto){
-        if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new RuntimeException("Ação não autorizada");
+        if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
 
         Optional<Locacao> locacao = locacaoRepository.findById(dto.getId());
         Veiculo veiculoAntigo = new Veiculo();
 
         if (locacao.isPresent()) {
             if(locacao.get().getStatusLocacao().getNomeStatusLocacao().equals("Finalizada")){
-                throw new RuntimeException("Locação já finalizada, não é possível editar locações finalizadas");
+                throw new AcaoInvalida("Locação já finalizada, não é possível editar locações finalizadas");
             }
 
             Veiculo veiculo = veiculoRepository.findByPlaca(dto.getPlacaVeiculo());
@@ -109,7 +113,7 @@ public class LocacaoService {
             veiculo.setStatusVeiculo(statusVeiculoRepository.findByNome("Alugado"));
             veiculoRepository.save(veiculo); //da update
         }else{
-            throw new RuntimeException("Locacao não encontrada, verifica o id ai brunin");
+            throw new RecursoNaoEncontrado("Locacao não encontrada, verifica o id ai brunin");
         }
     }
 
@@ -122,7 +126,7 @@ public class LocacaoService {
             veiculoRepository.save(veiculo); //da update
             locacaoRepository.deleteById(id); //da delete
         }else{
-            throw new RuntimeException("Locacao não encontrada, verificar id");
+            throw new RecursoNaoEncontrado("Locacao não encontrada, verificar id");
         }
     }
 }

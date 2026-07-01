@@ -7,6 +7,7 @@ import dto.TelefoneEdicaoDTO;
 import entity.Endereco;
 import entity.Pessoa;
 import entity.Telefone;
+import exception.DadosInvalidos;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.PessoaRepository;
@@ -34,24 +35,22 @@ public class PessoaService {
         }
     }
 
-    public boolean VerificarDados(String cpf, String email, LocalDate dataNascimento){
+    public void VerificarDados(String cpf, String email, LocalDate dataNascimento){
         //Verifica CPF
 
         if(cpf.isBlank() || cpf.length() != 11){
-            return false;
+            throw new DadosInvalidos("CPF inválido ou vazio");
         }
 
         if(!email.isEmpty()){ //caso tenha email
             if(!email.contains("@")){ //caso o email não tenha @
-                return false;
+                throw new DadosInvalidos("Email inválido");
             }
         }
 
         if(!LocalDate.now().isAfter(dataNascimento)){ //caso a data de nascimento seja depois do ano atual
-            return false;
+            throw new DadosInvalidos("Data de nascimento inválida");
         }
-
-        return true;
     }
 
     public Pessoa Cadastro(PessoaCadastroDTO dto, EnderecoCadastroDTO dto2) {

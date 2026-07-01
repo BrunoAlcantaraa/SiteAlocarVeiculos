@@ -5,6 +5,8 @@ import dto.PessoaEdicaoDTO;
 import dto.TelefoneEdicaoDTO;
 import entity.Cliente;
 import entity.Pessoa;
+import exception.DadosInvalidos;
+import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
@@ -30,10 +32,7 @@ public class ClienteService {
         if(funcionarioRepository.findByPessoaCPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf());
         }else { //caso não seja um funcionário, segue o fluxo normal
-            if(!pessoaService.VerificarDados(pesDto.getCpf(),
-                    pesDto.getEmail(),
-                    pesDto.getDataNascimento()))
-                throw new RuntimeException("Algum dado (cpf, email ou data de nascimento) estão inválidos");
+            pessoaService.VerificarDados(pesDto.getCpf(),pesDto.getEmail(),pesDto.getDataNascimento());
 
             pessoa = pessoaService.Cadastro(pesDto,enderecoDto);
         }
@@ -50,7 +49,7 @@ public class ClienteService {
             Pessoa pes = cliente.get().getPessoa();
             pessoaService.Edicao(pes,pesDto,enderecoDto,telefoneDto);
         }else{
-            throw new RuntimeException("Cliente não encontrado");
+            throw new RecursoNaoEncontrado("Cliente não encontrado");
         }
     }
 }
