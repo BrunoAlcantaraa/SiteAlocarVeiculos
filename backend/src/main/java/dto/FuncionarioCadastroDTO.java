@@ -14,4 +14,7 @@ public class FuncionarioCadastroDTO {
     private String cargo;
     private String username;
     private String senha;
+
+    private PessoaCadastroDTO pessoa;
+    private EnderecoCadastroDTO endereco;
 }

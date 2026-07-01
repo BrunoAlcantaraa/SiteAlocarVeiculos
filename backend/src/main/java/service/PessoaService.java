@@ -1,9 +1,6 @@
 package service;
 
-import dto.EnderecoCadastroDTO;
-import dto.PessoaCadastroDTO;
-import dto.PessoaEdicaoDTO;
-import dto.TelefoneEdicaoDTO;
+import dto.*;
 import entity.Endereco;
 import entity.Pessoa;
 import entity.Telefone;
@@ -33,6 +30,29 @@ public class PessoaService {
         }else{
             return false;
         }
+    }
+
+    public String VoltaSexo(Boolean sexo){
+        if(sexo == null){
+            return null;
+        }else if(sexo){
+            return "Masculino";
+        }else{
+            return "Femenino";
+        }
+    }
+
+    public PessoaRetornoDTO ConverterParaDto(Pessoa pessoa){
+        PessoaRetornoDTO dto = new PessoaRetornoDTO();
+        String sexo = VoltaSexo(pessoa.getSexo());
+
+        dto.setNome(pessoa.getNomePessoa());
+        dto.setEmail(pessoa.getEmail());
+        dto.setSexo(sexo);
+        dto.setDataNascimento(pessoa.getDataNascimento());
+        dto.setCpf(pessoa.getCPF());
+
+        return dto;
     }
 
     public void VerificarDados(String cpf, String email, LocalDate dataNascimento){

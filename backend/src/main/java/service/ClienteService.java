@@ -1,8 +1,6 @@
 package service;
 
-import dto.PessoaCadastroDTO;
-import dto.PessoaEdicaoDTO;
-import dto.TelefoneEdicaoDTO;
+import dto.*;
 import entity.Cliente;
 import entity.Pessoa;
 import exception.DadosInvalidos;
@@ -10,8 +8,8 @@ import exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
-import dto.EnderecoCadastroDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,9 +23,25 @@ public class ClienteService {
     private final FuncionarioRepository funcionarioRepository;
     private final EnderecoRepository enderecoRepository;
     private PessoaService pessoaService;
+    private EnderecoService enderecoService;
 
-    public void Cadastrar(PessoaCadastroDTO pesDto, EnderecoCadastroDTO enderecoDto){
+    public ClienteRetornoDTO ConverterParaDTO(Cliente cliente){
+        ClienteRetornoDTO dto = new ClienteRetornoDTO();
+        PessoaRetornoDTO pesDto = pessoaService.ConverterParaDto(cliente.getPessoa());
+        EnderecoCadastroDTO endrDto = enderecoService.ConverterParaDTO(cliente.getPessoa().getEndereco());
+
+        dto.setPessoaDTO(pesDto);
+        dto.setEnderecoDTO(endrDto);
+        dto.setTelefones(telefoneRepository.findAll());
+
+        return dto;
+    }
+
+    public void Cadastrar(ClienteCadastroDTO dto) {
         Pessoa pessoa = new Pessoa();
+
+        PessoaCadastroDTO pesDto = dto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = dto.getEndereco();
 
         if(funcionarioRepository.findByPessoaCPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf());
@@ -42,8 +56,12 @@ public class ClienteService {
         clienteRepository.save(cliente); //da o insert
     }
 
-    public void Editar(Long id, PessoaEdicaoDTO pesDto, EnderecoCadastroDTO enderecoDto, TelefoneEdicaoDTO telefoneDto){
-        Optional<Cliente> cliente = clienteRepository.findById(id);
+    public void Editar(ClienteEdicaoDTO dto) {
+        PessoaEdicaoDTO pesDto = dto.getPessoa();
+        EnderecoCadastroDTO enderecoDto = dto.getEndereco();
+        TelefoneEdicaoDTO telefoneDto = dto.getTelefone();
+
+        Optional<Cliente> cliente = clienteRepository.findById(dto.getId());
 
         if(cliente.isPresent()){
             Pessoa pes = cliente.get().getPessoa();
@@ -51,5 +69,11 @@ public class ClienteService {
         }else{
             throw new RecursoNaoEncontrado("Cliente não encontrado");
         }
+    }
+
+    public List<ClienteRetornoDTO> Listar(){
+        List<Cliente> clientes =  clienteRepository.findAll();
+
+        return clientes.stream().map(this::ConverterParaDTO).toList();
     }
 }

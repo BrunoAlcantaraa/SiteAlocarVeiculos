@@ -15,4 +15,8 @@ public class FuncionarioEdicaoDTO {
     private String cargo;
     private String username;
     private String senha;
+
+    private PessoaEdicaoDTO pessoa;
+    private EnderecoCadastroDTO endereco;
+    private TelefoneEdicaoDTO telefone;
 }

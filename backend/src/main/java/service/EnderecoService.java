@@ -19,6 +19,20 @@ public class EnderecoService {
     private final EstadoRepository estadoRepository;
     private final CidadeRepository cidadeRepository;
 
+    public EnderecoCadastroDTO ConverterParaDTO(Endereco endereco){
+        EnderecoCadastroDTO dto = new EnderecoCadastroDTO();
+
+        dto.setRua(endereco.getRua());
+        dto.setNumero(endereco.getNumero());
+        dto.setComplemento(endereco.getComplemento());
+        dto.setBairro(endereco.getBairro());
+        dto.setCep(endereco.getCEP());
+        dto.setCidade(endereco.getCidade().getNomeCidade());
+        dto.setEstado(endereco.getCidade().getEstado().getNomeEstado());
+
+        return dto;
+    }
+
     public Endereco cadastrar(EnderecoCadastroDTO dto){
         Endereco endereco = new Endereco();
         Estado estado = estadoRepository.findByNome(dto.getEstado()); //pesquisa um estado para evitar pegar a cidade errada
