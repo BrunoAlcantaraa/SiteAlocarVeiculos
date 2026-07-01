@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/Veiculos")
 public class VeiculoController {
     @Autowired
     private VeiculoService veiculoService;

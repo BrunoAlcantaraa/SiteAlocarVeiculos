@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/Cobrancas")
 public class CobrancaPlusController {
     @Autowired
     private CobrancaPlusService service;

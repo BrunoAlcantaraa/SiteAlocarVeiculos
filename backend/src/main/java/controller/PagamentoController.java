@@ -15,6 +15,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/Pagamentos")
 public class PagamentoController {
     @Autowired
     private PagamentoService pagamentoService;

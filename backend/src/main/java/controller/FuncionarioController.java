@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/Funcionarios")
 public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;

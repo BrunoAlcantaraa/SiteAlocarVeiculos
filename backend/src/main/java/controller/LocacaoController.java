@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
+@RequestMapping("/Locacoes")
 public class LocacaoController {
     @Autowired
     private LocacaoService locacaoService;
