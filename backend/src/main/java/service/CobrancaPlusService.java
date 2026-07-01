@@ -1,6 +1,8 @@
 package service;
 
 import dto.CobrancaPlusCadastro;
+import dto.CobrancaPlusRetornoDTO;
+import dto.LocacaoRetornoDTO;
 import entity.CobrancaAdicional;
 import entity.Locacao;
 import exception.RecursoNaoEncontrado;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import repository.CobrancaAdicionalRepository;
 import repository.LocacaoRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -16,6 +19,19 @@ import java.util.Optional;
 public class CobrancaPlusService {
     private final CobrancaAdicionalRepository cobrancaAdicionalRepository;
     private final LocacaoRepository locacaoRepository;
+
+    private LocacaoService locacaoService;
+
+    public CobrancaPlusRetornoDTO ConverterParaDTO(CobrancaAdicional cobrancaAdicional) {
+        CobrancaPlusRetornoDTO dto = new CobrancaPlusRetornoDTO();
+        LocacaoRetornoDTO lc = locacaoService.ConverterParaDTO(cobrancaAdicional.getLocacao());
+
+        dto.setDescricao(cobrancaAdicional.getDescricaoCobranca());
+        dto.setLocacaoRetornoDTO(lc);
+        dto.setValor(cobrancaAdicional.getValorCobranca());
+
+        return dto;
+    }
 
     public void Cadastro(CobrancaPlusCadastro dto){
         CobrancaAdicional plus = new CobrancaAdicional();
@@ -33,5 +49,11 @@ public class CobrancaPlusService {
 
     public void Remover(Long id){
         cobrancaAdicionalRepository.deleteById(id);
+    }
+
+    public List<CobrancaPlusRetornoDTO> Listar(){
+        List<CobrancaAdicional> cobrancas =  cobrancaAdicionalRepository.findAll();
+
+        return cobrancas.stream().map(this::ConverterParaDTO).toList();
     }
 }

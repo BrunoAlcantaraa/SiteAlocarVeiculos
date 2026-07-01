@@ -1,8 +1,6 @@
 package service;
 
-import dto.LocacaoCadastroDTO;
-import dto.LocacaoConclusaoDTO;
-import dto.LocacaoEdicaoDTO;
+import dto.*;
 import entity.*;
 import exception.AcaoInvalida;
 import exception.AutorizacaoNegada;
@@ -12,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import repository.*;
 
+import java.util.List;
 import java.util.Optional;
 
 
@@ -27,6 +26,29 @@ public class LocacaoService {
     private final StatusVeiculoRepository statusVeiculoRepository;
 
     private FuncionarioService funcionarioService;
+    private ClienteService clienteService;
+    private VeiculoService veiculoService;
+    private FuncionarioService funcFuncionarioService;
+
+    public LocacaoRetornoDTO ConverterParaDTO(Locacao locacao) {
+        LocacaoRetornoDTO dto = new LocacaoRetornoDTO();
+        ClienteRetornoDTO cli = clienteService.ConverterParaDTO(locacao.getCliente());
+        FuncionarioRetornoDTO func = funcionarioService.ConverterParaDTO(locacao.getFuncionario());
+        VeiculoRetornoDTO ve = veiculoService.ConverterParaDTO(locacao.getVeiculo());
+
+        dto.setCliente(cli);
+        dto.setFuncionario(func);
+        dto.setStatus(locacao.getStatusLocacao().getNomeStatusLocacao());
+        dto.setVeiculo(ve);
+        dto.setDataSaida(locacao.getDataSaida());
+        dto.setDataRetornoPrevista(locacao.getDataRetornoPrevisto());
+        dto.setDataRetornoReal(locacao.getDataRetornoReal());
+        dto.setKmSaida(locacao.getKmsSaida());
+        dto.setKmRetorno(locacao.getKmsRetorno());
+        dto.setCobrancas(locacao.getCobrancaPlus());
+
+        return dto;
+    }
 
     public void Cadastro(LocacaoCadastroDTO dto) {
         Locacao locacao = new Locacao();
@@ -128,5 +150,11 @@ public class LocacaoService {
         }else{
             throw new RecursoNaoEncontrado("Locacao não encontrada, verificar id");
         }
+    }
+
+    public List<LocacaoRetornoDTO> Listar(){
+        List<Locacao> locacoes = locacaoRepository.findAll();
+
+        return locacoes.stream().map(this::ConverterParaDTO).toList();
     }
 }

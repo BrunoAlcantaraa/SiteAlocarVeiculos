@@ -10,6 +10,7 @@ import repository.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -21,7 +22,9 @@ public class FuncionarioService {
     private final PessoaRepository pessoaRepository;
     private final ClienteRepository clienteRepository;
     private final CargoRepository cargoRepository;
+    private final TelefoneRepository telefoneRepository;
     private PessoaService pessoaService;
+    private EnderecoService enderecoService;
 
     public boolean VerificarPermissao(Long id){
         Optional<Funcionario> funcionarioLogado = funcionarioRepository.findById(id);
@@ -34,15 +37,33 @@ public class FuncionarioService {
         return true;
     }
 
-    public boolean verificaSenha(LoginDTO dto) {
+    public FuncionarioRetornoDTO ConverterParaDTO(Funcionario funcionario){
+        FuncionarioRetornoDTO dto = new FuncionarioRetornoDTO();
+        PessoaRetornoDTO pes = pessoaService.ConverterParaDto(funcionario.getPessoa());
+        EnderecoCadastroDTO endr = enderecoService.ConverterParaDTO(funcionario.getPessoa().getEndereco());
+
+        dto.setPessoa(pes);
+        dto.setEndereco(endr);
+        dto.setSalario(funcionario.getSalario());
+        dto.setCargo(funcionario.getCargo().getNomeCargo());
+        dto.setTelefones(telefoneRepository.findAll());
+
+        return dto;
+    }
+
+    public Long verificaSenha(LoginDTO dto) {
         Funcionario funcionario = funcionarioRepository.findByUsername(dto.getUsername());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
         if(funcionario == null) {
-            return false;
+            return null;
         }
 
-        return encoder.matches(dto.getSenha(), funcionario.getSenhaHash());
+        if(encoder.matches(dto.getSenha(), funcionario.getSenhaHash())) {
+            return funcionario.getIdFuncionario();
+        }
+
+        return null;
     }
 
     public void Cadastrar(FuncionarioCadastroDTO dto) {
@@ -94,5 +115,11 @@ public class FuncionarioService {
             func.get().setCargo(cargo);
             funcionarioRepository.save(func.get()); //da update
         }
+    }
+
+    public List<FuncionarioRetornoDTO> Listar(){
+        List<Funcionario> funcionarios =  funcionarioRepository.findAll();
+
+        return funcionarios.stream().map(this::ConverterParaDTO).toList();
     }
 }
