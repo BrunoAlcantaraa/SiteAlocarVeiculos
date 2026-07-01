@@ -2,6 +2,7 @@ package service;
 
 import dto.VeiculoCadastroDTO;
 import dto.VeiculoEdicaoDTO;
+import dto.VeiculoRetornoDTO;
 import entity.*;
 import exception.AutorizacaoNegada;
 import exception.RecursoNaoEncontrado;
@@ -11,6 +12,7 @@ import repository.*;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -24,6 +26,23 @@ public class VeiculoService {
     private final CombustivelRepository combustivelRepository;
 
     private FuncionarioService funcionarioService;
+
+    public VeiculoRetornoDTO ConverterParaDTO(Veiculo veiculo){
+        VeiculoRetornoDTO dto = new VeiculoRetornoDTO();
+
+        dto.setCor(veiculo.getCor());
+        dto.setPlaca(veiculo.getPlaca());
+        dto.setAnoFabricacao(veiculo.getModelo().getAnoFab());
+        dto.setKmAtual(veiculo.getKmsAtual());
+        dto.setRenavam(veiculo.getRenavam());
+        dto.setTipo(veiculo.getTipoVeiculo());
+        dto.setModelo(veiculo.getModelo().getNomeModelo());
+        dto.setMarca(veiculo.getModelo().getMarca().getNomeMarca());
+        dto.setCombustivel(veiculo.getCombustivel().getNomeCombustivel());
+        dto.setUrlImagem(veiculo.getUrlImagem());
+
+        return dto;
+    }
 
     public void Cadastro(VeiculoCadastroDTO dto){
         if(!funcionarioService.VerificarPermissao(dto.getIdFunc())) throw new AutorizacaoNegada("Ação não autorizada");
@@ -88,5 +107,11 @@ public class VeiculoService {
 
     public void Remover(Long id){
         veiculoRepository.deleteById(id); //da delete com base no id
+    }
+
+    public List<VeiculoRetornoDTO> Listar(){
+        List<Veiculo> veiculos = veiculoRepository.findAll();
+
+        return veiculos.stream().map(this::ConverterParaDTO).toList();
     }
 }

@@ -1,9 +1,6 @@
 package service;
 
-import dto.AdicionarValorDTO;
-import dto.CobrancaPlusCadastro;
-import dto.PagamentoCadastroDTO;
-import dto.PagamentoCadastroPosteriorDTO;
+import dto.*;
 import entity.CobrancaAdicional;
 import entity.Locacao;
 import entity.Pagamento;
@@ -19,6 +16,7 @@ import repository.StatusPagamentoRepository;
 
 import java.math.BigDecimal;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -28,7 +26,22 @@ public class PagamentoService {
     private final PagamentoRepository pagamentoRepository;
     private final LocacaoRepository locacaoRepository;
     private final StatusPagamentoRepository statusPagamentoRepository;
+
     private CobrancaPlusService cobrancaPlusService;
+    private LocacaoService locacaoService;
+
+    public PagamentoRetornoDTO ConverterParaDTO(Pagamento pagamento) {
+        PagamentoRetornoDTO dto = new PagamentoRetornoDTO();
+        LocacaoRetornoDTO locacaoRetornoDTO = locacaoService.ConverterParaDTO(pagamento.getLocacaoPagamento());
+
+        dto.setDataPagamento(pagamento.getDataPagamento());
+        dto.setValorPagamento(pagamento.getValorPagamento());
+        dto.setFormaPagamento(pagamento.getFormaPagamento());
+        dto.setLocacao(locacaoRetornoDTO);
+        dto.setStatus(pagamento.getStatusPagamento().getNomeStatusPagamento());
+
+        return dto;
+    }
 
     public BigDecimal CalcularValorFinal(Long idLocacao){
         Optional<Locacao> locacao = locacaoRepository.findById(idLocacao);
@@ -106,5 +119,11 @@ public class PagamentoService {
             pagamento.get().setValorPagamento(valorNovo);
             pagamentoRepository.save(pagamento.get());
         }
+    }
+
+    public List<PagamentoRetornoDTO> Listar(){
+        List<Pagamento> pagamentos =  pagamentoRepository.findAll();
+
+        return pagamentos.stream().map(this::ConverterParaDTO).toList();
     }
 }
