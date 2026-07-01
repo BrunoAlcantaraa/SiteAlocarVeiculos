@@ -1,10 +1,10 @@
-create table estado (
+create table estado ( --feito
 	id_estd SERIAL primary key,
 	nome_estd varchar(50) not null unique,
 	sigla varchar(2) not null unique
 );
 
-create table cidade (
+create table cidade ( --feito
 	id_cid SERIAL primary key,
 	nome_cid varchar(100) not null,
 	id_estd_cid int,
@@ -15,7 +15,7 @@ create table cidade (
 		on delete cascade
 );
 
-create table endereco(
+create table endereco( --feito
 	id_endr SERIAL primary key,
 	rua varchar(100),
 	numero varchar(20),
@@ -30,7 +30,7 @@ create table endereco(
 		on delete cascade
 );
 
-create table pessoa(
+create table pessoa( --feito
 	id_pes SERIAL primary key,
 	nome_pes varchar(200),
 	CPF varchar(12) unique,
@@ -45,7 +45,7 @@ create table pessoa(
 		on delete cascade
 );
 
-create table cliente(
+create table cliente( --feito
 	id_cliente serial primary key,
 	id_pes_cliente int,
 	
@@ -54,7 +54,7 @@ create table cliente(
 		references pessoa(id_pes)
 );
 
-create table telefone(
+create table telefone( --feito
 	id_tel serial primary key,
 	numero_tel varchar(10),
 	id_pes_tel int,
@@ -65,14 +65,16 @@ create table telefone(
 		on delete cascade
 );
 
-create table cargo(
+create table cargo( --feito
 	id_cargo serial primary key,
 	nome_cargo varchar(50) unique
 )
 
-create table funcionario(
+create table funcionario( --feito
 	id_func serial primary key,
 	salario decimal(10,2),
+	username varchar(100),
+	senha_hash varchar(255),
 	id_pes_func int,
 	id_cargo_func int,
 	
@@ -87,12 +89,12 @@ create table funcionario(
 		on delete cascade
 );
 
-create table marca(
+create table marca( --feito
 	id_marca serial primary key,
 	nome_marca varchar(50)
 );
 
-create table modelo(
+create table modelo( --feito
 	id_modelo serial primary key,
 	nome_modelo varchar(50),
 	ano_fab int,
@@ -105,17 +107,17 @@ create table modelo(
 		on delete cascade
 );
 
-create table combustivel(
+create table combustivel( --feito
 	id_combustivel serial primary key,
 	nome_combustivel varchar(50) unique
 );
 
-create table status_veiculo(
+create table status_veiculo( --feito
 	id_status serial primary key,
 	nome_status varchar(50) unique
 );
 
-create table veiculo(
+create table veiculo( --feito
 	id_veiculo serial primary key,
 	renavam varchar(12) unique,
 	placa varchar(9) unique,
@@ -144,26 +146,12 @@ create table veiculo(
 		on delete cascade
 );
 
-create table manutencao(
-	id_manut serial primary key,
-	data_inicio date,
-	data_fim date,
-	descricao_manut text,
-	valor_manut decimal(10,2),
-	
-	id_veiculo_manut int,
-	
-	constraint fk_veiculo_manut
-		foreign key(id_veiculo_manut)
-		references veiculo(id_veiculo)
-);
-
-create table status_locacao(
+create table status_locacao( --feito
 	id_statuslocacao serial primary key,
 	nome_statuslocacao varchar(50)
 );
 
-create table locacao(
+create table locacao( --feito
 	id_locacao serial primary key,
 	data_saida date,
 	data_retorno_previsto date,
@@ -197,7 +185,7 @@ create table locacao(
 		on delete cascade
 );
 
-create table cobranca_adicional(
+create table cobranca_adicional( --feito
 	id_cobranca serial primary key,
 	descricao_cobranca text,
 	valor_cobranca decimal(10,2),
@@ -210,12 +198,12 @@ create table cobranca_adicional(
 		on delete cascade
 );
 
-create table status_pagamento(
+create table status_pagamento( --feito
 	id_status_pagamento serial primary key,
 	nome_status_pagamento varchar(50)
 );
 
-create table pagamento(
+create table pagamento( --feito
 	id_pagamento serial primary key,
 	data_pagamento date,
 	valor_pagamento decimal(10,2),
@@ -234,7 +222,3 @@ create table pagamento(
 		references status_pagamento(id_status_pagamento)
 		on delete cascade
 );
-
-
-
-
