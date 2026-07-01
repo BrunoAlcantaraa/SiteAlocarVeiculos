@@ -12,14 +12,14 @@ body {
     overflow: hidden;
 }
 
-/* ===== LAYOUT ===== */
-
 #layout {
     display: flex;
     height: 100vh;
 }
 
-/* ===== SIDEBAR ===== */
+/* =====================
+   SIDEBAR
+   ===================== */
 
 #sidebar {
     width: 220px;
@@ -55,6 +55,7 @@ body {
 }
 
 .nav-item {
+    font-weight: bold;
     display: block;
     color: rgba(255, 255, 255, 0.52);
     text-decoration: none;
@@ -75,7 +76,9 @@ body {
     border-left-color: #57708a;
 }
 
-/* ===== MAIN ===== */
+/* =====================
+   MAIN / ACTION BAR
+   ===================== */
 
 #main {
     flex: 1;
@@ -84,8 +87,6 @@ body {
     min-width: 0;
     overflow: hidden;
 }
-
-/* ===== ACTION BAR ===== */
 
 #action-bar {
     background: #fff;
@@ -134,7 +135,19 @@ body {
     background-color: #f0f4f8;
 }
 
-/* ===== CONTENT ===== */
+.btn-action.btn-perigo {
+    background-color: #fff;
+    color: #c0392b;
+    border: 1px solid #f5c6cb;
+}
+
+.btn-action.btn-perigo:hover {
+    background-color: #fdecea;
+}
+
+/* =====================
+   CONTEÚDO
+   ===================== */
 
 #content {
     flex: 1;
@@ -142,7 +155,9 @@ body {
     padding: 28px;
 }
 
-/* ===== DASHBOARD ===== */
+/* =====================
+   DASHBOARD
+   ===================== */
 
 #pag-dashboard {
     display: none;
@@ -210,151 +225,489 @@ body {
     color: #aaa;
 }
 
-/* ===== ALOCAÇÃO ===== */
+/* =====================
+   PÁGINA ALOCAÇÃO — GRADE
+   ===================== */
 
 #pag-alocacao {
     display: none;
 }
 
-#container-carros {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+#msg-sem-veiculos {
+    display: none;
+    font-size: 14px;
+    color: #aaa;
+    margin-top: 8px;
 }
 
-.card-carro {
+#container-veiculos {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.card-veiculo {
     background-color: #fff;
     border: 1px solid #e4e7eb;
-    border-radius: 8px;
-    width: 190px;
+    border-radius: 10px;
     padding: 16px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
-    align-items: center;
     gap: 4px;
-    text-align: center;
+    position: relative;
+    transition: box-shadow 0.15s, transform 0.15s;
 }
 
-.card-carro img {
-    width: 130px;
-    height: 80px;
+.card-veiculo:hover:not(.card-indisponivel) {
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    transform: translateY(-2px);
+}
+
+.card-indisponivel {
+    opacity: 0.6;
+}
+
+.card-img-wrapper {
+    position: relative;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+.card-img-wrapper img {
+    width: 100%;
+    height: 100px;
     object-fit: contain;
-    margin-bottom: 4px;
+    background: #f7f9fc;
+    border-radius: 6px;
+    padding: 8px;
 }
 
-.card-carro h3 {
+/* Badges de status (card e detalhe) */
+.status-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 3px 8px;
+    border-radius: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+}
+
+.badge-disponivel  { background: #d4edda; color: #155724; }
+.badge-alugado     { background: #f8d7da; color: #721c24; }
+.badge-manutencao  { background: #fff3cd; color: #856404; }
+
+.card-veiculo h3 {
     font-size: 14px;
     font-weight: 600;
     color: #1e2a38;
 }
 
-.card-carro p {
+.card-veiculo .card-marca {
     font-size: 12px;
-    color: #999;
+    color: #888;
 }
 
-.card-carro button {
+.card-veiculo .card-placa {
+    font-size: 11px;
+    color: #aaa;
+    font-family: monospace;
+    letter-spacing: 0.5px;
+}
+
+.card-veiculo .card-preco {
+    font-size: 13px;
+    font-weight: 700;
+    color: #3c4d5f;
+    margin-top: 6px;
+}
+
+.card-veiculo .card-indisponivel-msg {
+    font-size: 11px;
+    color: #e74c3c;
+    margin-top: 4px;
+}
+
+.card-veiculo button {
     width: 100%;
-    background-color: #3c4d5f;
-    color: #fff;
     border: none;
-    padding: 8px;
-    border-radius: 4px;
+    padding: 9px;
+    border-radius: 5px;
     cursor: pointer;
     font-size: 13px;
     font-family: Arial, sans-serif;
-    margin-top: 10px;
+    font-weight: 600;
+    margin-top: 12px;
+    transition: background-color 0.15s;
 }
 
-.card-carro button:hover {
+.card-veiculo button.btn-selecionar {
+    background-color: #3c4d5f;
+    color: #fff;
+}
+
+.card-veiculo button.btn-selecionar:hover {
     background-color: #2c3a4a;
 }
 
-#msg-sem-carros {
-    display: none;
-    font-size: 14px;
+.card-veiculo button.btn-bloqueado {
+    background-color: #e9ecef;
     color: #aaa;
+    cursor: not-allowed;
 }
 
-/* ===== MODAL ===== */
+/* =====================
+   ALOCAÇÃO — FORMULÁRIO
+   ===================== */
 
-.modal {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.45);
-    justify-content: center;
+#alocacao-form-wrapper {
+    animation: fadeInUp 0.2s ease;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+.alocacao-form-header {
+    display: flex;
     align-items: center;
-    z-index: 1000;
+    gap: 14px;
+    margin-bottom: 24px;
 }
 
-.modal-conteudo {
-    background: white;
-    padding: 28px 24px;
+.btn-voltar {
+    background: none;
+    border: 1px solid #c5cfd8;
+    color: #3c4d5f;
+    padding: 6px 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 13px;
+    font-family: Arial, sans-serif;
+    transition: background 0.15s;
+    flex-shrink: 0;
+}
+
+.btn-voltar:hover {
+    background: #f0f4f8;
+}
+
+.alocacao-form-header span {
+    font-size: 15px;
+    font-weight: 600;
+    color: #1e2a38;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.alocacao-layout {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: 24px;
+    align-items: start;
+}
+
+/* Painel esquerdo: detalhes do veículo */
+.veiculo-detalhe-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.09);
+    position: sticky;
+    top: 0;
+}
+
+.det-img-wrapper {
+    width: 100%;
+    background: #f7f9fc;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 14px;
+}
+
+.det-img-wrapper img {
+    width: 100%;
+    height: 120px;
+    object-fit: contain;
+}
+
+.det-badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
     border-radius: 12px;
-    width: 320px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+}
+
+.det-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 10px;
+}
+
+.det-item {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 3px;
 }
 
-.modal-conteudo h2 {
-    font-size: 16px;
+.det-item-full {
+    grid-column: 1 / -1;
+    border-top: 1px solid #e4e7eb;
+    padding-top: 12px;
+}
+
+.det-label {
+    font-size: 10px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 600;
+}
+
+.det-valor {
+    font-size: 13px;
+    color: #1e2a38;
+    font-weight: 500;
+}
+
+.det-preco-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.det-preco {
+    font-size: 20px;
+    font-weight: 700;
+    color: #3c4d5f;
+}
+
+/* Painel direito: formulário */
+.alocacao-form-campos {
+    background: #fff;
+    border-radius: 10px;
+    padding: 24px 28px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.09);
+}
+
+/* Campos do formulário de alocação */
+.form-field {
+    margin-bottom: 16px;
+}
+
+.form-field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: #556070;
+    margin-bottom: 6px;
+    letter-spacing: 0.2px;
+}
+
+.obrigatorio {
+    color: #e74c3c;
+    margin-left: 1px;
+}
+
+.form-field input,
+.form-field select {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d8dee6;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background: #fff;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-field input:focus,
+.form-field select:focus {
+    outline: none;
+    border-color: #57708a;
+    box-shadow: 0 0 0 3px rgba(87, 112, 138, 0.14);
+}
+
+.form-field input.campo-invalido,
+.form-field select.campo-invalido {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+}
+
+.form-field select:disabled {
+    background: #f4f4f4;
+    color: #aaa;
+    cursor: not-allowed;
+}
+
+.campo-erro {
+    display: block;
+    font-size: 11px;
+    color: #e74c3c;
+    margin-top: 4px;
+    min-height: 15px;
+    font-weight: 500;
+}
+
+.form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+/* Resumo da locação */
+.resumo-locacao {
+    background: #f7f9fc;
+    border: 1px solid #e0e6ed;
+    border-radius: 8px;
+    padding: 18px 20px;
+    margin-top: 4px;
+    margin-bottom: 22px;
+}
+
+.resumo-locacao h4 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a8fa6;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #dde3ea;
+}
+
+.resumo-linha {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 13px;
+    color: #556070;
+    padding: 5px 0;
+}
+
+.resumo-linha span:last-child {
+    font-weight: 600;
+    color: #1e2a38;
+    text-align: right;
+}
+
+.resumo-total {
+    border-top: 1px solid #dde3ea;
+    margin-top: 10px;
+    padding-top: 12px !important;
+    font-size: 15px;
+    font-weight: 700;
     color: #1e2a38;
 }
 
-.modal-conteudo select {
-    padding: 9px 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: Arial, sans-serif;
-    width: 100%;
+.resumo-total span:first-child {
+    font-weight: 700;
+    color: #1e2a38;
 }
 
-#alocar-fechar {
+.resumo-total span:last-child {
+    color: #1a7a3c;
+    font-size: 18px;
+}
+
+/* Notificações inline */
+.notif {
+    border-radius: 6px;
+    padding: 12px 16px;
+    margin-bottom: 18px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.notif.sucesso {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.notif.erro {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Form actions (alocação) */
+.form-actions {
     display: flex;
     gap: 10px;
-    justify-content: flex-end;
+    margin-top: 4px;
 }
 
-#alocar-fechar button {
-    padding: 8px 18px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 13px;
-    font-family: Arial, sans-serif;
+.form-actions .btn-cancelar {
+    background-color: #e5e9ef;
+    color: #334155;
     border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    transition: background 0.15s;
 }
 
-#alocar-fechar button:first-child {
-    background-color: transparent;
-    color: #3c4d5f;
-    border: 1px solid #c5cfd8;
+.form-actions .btn-cancelar:hover {
+    background-color: #d5dae3;
 }
 
-#alocar-fechar button:first-child:hover {
-    background-color: #f0f4f8;
-}
-
-#btn-alocar {
+.form-actions .btn-confirmar {
     background-color: #3c4d5f;
-    color: white;
+    color: #fff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+    transition: background 0.15s;
+    flex: 1;
 }
 
-#btn-alocar:hover {
+.form-actions .btn-confirmar:hover {
     background-color: #2c3a4a;
 }
 
-/* ===== CADASTRO ===== */
+/* =====================
+   CADASTROS (Veículos / Clientes)
+   ===================== */
+
+#pag-cadastro-veiculos {
+    display: none;
+    flex-direction: column;
+    gap: 20px;
+}
 
 .pag-cadastro {
     display: none;
-    max-width: 440px;
 }
 
-.pag-cadastro input {
+.form-cadastrar {
+    width: 100%;
+    background: #fff;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.pag-cadastro input,
+.pag-cadastro select {
     display: block;
     width: 100%;
     padding: 10px 12px;
@@ -364,9 +717,11 @@ body {
     font-size: 14px;
     font-family: Arial, sans-serif;
     background: #fff;
+    color: #333;
 }
 
-.pag-cadastro input:focus {
+.pag-cadastro input:focus,
+.pag-cadastro select:focus {
     outline: none;
     border-color: #57708a;
     box-shadow: 0 0 0 2px rgba(87, 112, 138, 0.15);
@@ -385,4 +740,388 @@ body {
 
 .pag-cadastro button:hover {
     background-color: #2c3a4a;
+}
+
+/* Form sections (shared) */
+.form-section {
+    margin-bottom: 24px;
+}
+
+.form-section h4 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a8fa6;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid #e4e7eb;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.form-row input,
+.form-row select {
+    margin-bottom: 0;
+}
+
+/* Cadastro form actions */
+.form-actions button:first-child {
+    background-color: #e5e9ef;
+    color: #334155;
+}
+
+/* =====================
+   TABELAS
+   ===================== */
+
+.table-section {
+    background: #fff;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+    flex: 1;
+    min-height: 0;
+    overflow: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+}
+
+.data-table th,
+.data-table td {
+    padding: 10px 12px;
+    text-align: left;
+    border-bottom: 1px solid #e4e7eb;
+}
+
+.data-table th {
+    background-color: #f7f9fc;
+    color: #556070;
+    font-weight: 600;
+}
+
+.data-table tbody tr {
+    cursor: pointer;
+}
+
+.data-table tr:hover {
+    background-color: #fafbfc;
+}
+
+.data-table tr.linha-selecionada {
+    background-color: #e3ecf5;
+}
+
+.data-table tr.linha-selecionada:hover {
+    background-color: #d8e4f0;
+}
+
+/* =====================
+   BUSCA / FILTRO
+   ===================== */
+
+.search-bar {
+    margin-bottom: 14px;
+}
+
+.search-bar input {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    background: #fff;
+    color: #333;
+    margin-bottom: 0;
+}
+
+.search-bar input:focus {
+    outline: none;
+    border-color: #57708a;
+    box-shadow: 0 0 0 2px rgba(87, 112, 138, 0.15);
+}
+
+/* =====================
+   TELA DE LOGIN
+   ===================== */
+
+#login-screen {
+    position: fixed;
+    inset: 0;
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+}
+
+#login-card {
+    background: #fff;
+    border-radius: 10px;
+    padding: 40px 36px;
+    width: 360px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.10);
+}
+
+#login-logo {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+#login-logo h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1e2a38;
+}
+
+#login-logo span {
+    font-size: 12px;
+    color: #999;
+    display: block;
+    margin-top: 4px;
+}
+
+.login-field {
+    margin-bottom: 16px;
+}
+
+.login-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #7a8fa6;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    margin-bottom: 6px;
+}
+
+.login-field input {
+    display: block;
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background: #fff;
+}
+
+.login-field input:focus {
+    outline: none;
+    border-color: #57708a;
+    box-shadow: 0 0 0 2px rgba(87, 112, 138, 0.15);
+}
+
+#login-erro {
+    font-size: 13px;
+    color: #c0392b;
+    margin-bottom: 10px;
+    min-height: 18px;
+}
+
+#btn-entrar {
+    width: 100%;
+    background-color: #3c4d5f;
+    color: white;
+    border: none;
+    padding: 11px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    font-weight: 600;
+}
+
+#btn-entrar:hover {
+    background-color: #2c3a4a;
+}
+
+/* =====================
+   LOGOUT
+   ===================== */
+
+#sidebar-footer {
+    padding: 12px 16px;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.nav-logout {
+    background: white;
+    border: none;
+    font-weight: bold;
+    font-family: Arial, sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 6px 8px;
+    border-radius: 4px;
+    width: 100%;
+    text-align: left;
+    transition: color 0.15s, background-color 0.15s;
+}
+
+.nav-logout:hover {
+    color: rgba(255, 100, 100, 0.8);
+    background-color: rgba(255, 64, 64, 0.07);
+}
+
+/* =====================
+   ALOCAÇÃO — TOGGLE
+   ===================== */
+
+.alocacao-toggle {
+    display: inline-flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    padding: 6px;
+    background: #eef2f6;
+    border-radius: 999px;
+}
+
+.alocacao-toggle-btn {
+    border: none;
+    background: transparent;
+    color: #556070;
+    padding: 9px 16px;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    font-family: Arial, sans-serif;
+    transition: background-color 0.15s, color 0.15s, box-shadow 0.15s;
+}
+
+.alocacao-toggle-btn:hover {
+    background: #e2e8ef;
+    color: #1e2a38;
+}
+
+.alocacao-toggle-btn.active {
+    background: #3c4d5f;
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(60, 77, 95, 0.2);
+}
+
+.alocacao-view-panel {
+    display: none;
+}
+
+.alocacao-view-panel.active {
+    display: block;
+}
+
+.alocacao-subsecao {
+    margin-bottom: 32px;
+}
+
+.subsecao-titulo {
+    font-size: 13px;
+    font-weight: 700;
+    color: #556070;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 14px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid #e4e7eb;
+}
+
+.msg-vazia {
+    font-size: 13px;
+    color: #aaa;
+    margin-top: 8px;
+}
+
+.cards-alocacao-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 16px;
+}
+
+/* =====================
+   CARDS DISPONÍVEIS / RESERVADOS
+   ===================== */
+
+.card-info-list {
+    border-top: 1px solid #f0f2f5;
+    margin-top: 8px;
+    padding-top: 8px;
+}
+
+.card-info-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    padding: 4px 0;
+    border-bottom: 1px solid #f7f9fc;
+    gap: 8px;
+}
+
+.card-info-label {
+    color: #999;
+    flex-shrink: 0;
+}
+
+.card-info-val {
+    font-weight: 600;
+    color: #1e2a38;
+    text-align: right;
+}
+
+.card-info-preco .card-info-val {
+    color: #3c4d5f;
+    font-size: 13px;
+}
+
+.btn-alocar {
+    background-color: #3c4d5f !important;
+    color: #fff !important;
+}
+
+.btn-alocar:hover {
+    background-color: #2c3a4a !important;
+}
+
+.btn-finalizar {
+    background-color: #1a7a3c !important;
+    color: #fff !important;
+}
+
+.btn-finalizar:hover {
+    background-color: #155a2d !important;
+}
+
+/* =====================
+   TEXTAREA NO FORMULÁRIO
+   ===================== */
+
+.form-field textarea {
+    display: block;
+    width: 100%;
+    padding: 9px 12px;
+    border: 1px solid #d8dee6;
+    border-radius: 5px;
+    font-size: 14px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    background: #fff;
+    resize: vertical;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-field textarea:focus {
+    outline: none;
+    border-color: #57708a;
+    box-shadow: 0 0 0 3px rgba(87, 112, 138, 0.14);
 }
