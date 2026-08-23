@@ -20,7 +20,7 @@ public class PessoaService {
     private final PessoaRepository pessoaRepository;
     private final TelefoneRepository telefoneRepository;
 
-    private EnderecoService enderecoService;
+    private final EnderecoService enderecoService;
 
     public Boolean DefineSexo(String sexo){
         if(sexo == null){
@@ -58,18 +58,24 @@ public class PessoaService {
     public void VerificarDados(String cpf, String email, LocalDate dataNascimento){
         //Verifica CPF
 
-        if(cpf.isBlank() || cpf.length() != 11){
-            throw new DadosInvalidos("CPF inválido ou vazio");
-        }
-
-        if(!email.isEmpty()){ //caso tenha email
-            if(!email.contains("@")){ //caso o email não tenha @
-                throw new DadosInvalidos("Email inválido");
+        if(cpf != null) {
+            if (cpf.isBlank() || cpf.length() != 11) {
+                throw new DadosInvalidos("CPF inválido ou vazio");
             }
         }
 
-        if(!LocalDate.now().isAfter(dataNascimento)){ //caso a data de nascimento seja depois do ano atual
-            throw new DadosInvalidos("Data de nascimento inválida");
+        if(email != null) {
+            if (!email.isEmpty()) { //caso tenha email
+                if (!email.contains("@")) { //caso o email não tenha @
+                    throw new DadosInvalidos("Email inválido");
+                }
+            }
+        }
+
+        if(dataNascimento != null) {
+            if (!LocalDate.now().isAfter(dataNascimento)) { //caso a data de nascimento seja depois do ano atual
+                throw new DadosInvalidos("Data de nascimento inválida");
+            }
         }
     }
 

@@ -5,12 +5,10 @@ import com.ib.alocacao_carros.dto.VeiculoEdicaoDTO;
 import com.ib.alocacao_carros.dto.VeiculoRetornoDTO;
 import com.ib.alocacao_carros.entity.*;
 import com.ib.alocacao_carros.repository.*;
-import com.ib.alocacao_carros.entity.*;
 import com.ib.alocacao_carros.exception.AutorizacaoNegada;
 import com.ib.alocacao_carros.exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ib.alocacao_carros.repository.*;
 
 import java.math.BigDecimal;
 import java.text.Normalizer;
@@ -55,23 +53,23 @@ public class VeiculoService {
         String nomeMarca = Normalizer.normalize(dto.getMarca(), Normalizer.Form.NFD).toLowerCase();
         String nomeModelo = Normalizer.normalize(dto.getModelo(), Normalizer.Form.NFD).toLowerCase();
 
-        if(marcaRepository.findByNome(nomeMarca) == null){ //caso a marca não existe no banco, ele a cadastra
+        if(marcaRepository.findByNomeMarca(nomeMarca) == null){ //caso a marca não existe no banco, ele a cadastra
             marca.setNomeMarca(nomeMarca);
             marcaRepository.save(marca); //da insert na marca nova
-        }else if(modeloRepository.findByNomeAndAnoFab(nomeModelo, dto.getAnoFabricacao()) == null){ //caso não tenha esse modelo no banco
+        }else if(modeloRepository.findByNomeModeloAndAnoFab(nomeModelo, dto.getAnoFabricacao()) == null){ //caso não tenha esse modelo no banco
             modelo.setNomeModelo(nomeModelo);
             modelo.setAnoFab(dto.getAnoFabricacao());
             modelo.setValorDiario(new BigDecimal("0")); //define por padrão o valor de 0
-            modelo.setMarca(marcaRepository.findByNome(nomeMarca));
+            modelo.setMarca(marcaRepository.findByNomeMarca(nomeMarca));
             modeloRepository.save(modelo); //da o insert
         }else{ //caso ja exista o modelo e a marca
-            modelo = modeloRepository.findByNomeAndAnoFab(nomeModelo, dto.getAnoFabricacao());
+            modelo = modeloRepository.findByNomeModeloAndAnoFab(nomeModelo, dto.getAnoFabricacao());
         }
 
         //cria o objeto e pega os dois objetos necessários
         Veiculo veiculo = new Veiculo();
-        Combustivel combustivel = combustivelRepository.findByNome(dto.getCombustivel());
-        StatusVeiculo statusVeiculo = statusVeiculoRepository.findByNome("Disponível"); //ao cadastrar, o carro vai direto para disponível
+        Combustivel combustivel = combustivelRepository.findByNomeCombustivel(dto.getCombustivel());
+        StatusVeiculo statusVeiculo = statusVeiculoRepository.findByNomeStatusVeiculo("Disponível"); //ao cadastrar, o carro vai direto para disponível
 
         //define todos os atributos
         veiculo.setModelo(modelo);
@@ -92,7 +90,7 @@ public class VeiculoService {
         Optional<Veiculo> veiculo = veiculoRepository.findById(dto.getIdVeiculo());
 
         if(veiculo.isPresent()){
-            StatusVeiculo status = statusVeiculoRepository.findByNome(dto.getStatus());
+            StatusVeiculo status = statusVeiculoRepository.findByNomeStatusVeiculo(dto.getStatus());
 
             veiculo.get().setPlaca(dto.getPlaca());
             veiculo.get().setCor(dto.getCor());
@@ -107,8 +105,9 @@ public class VeiculoService {
         }
     }
 
-    public void Remover(Long id){
-        veiculoRepository.deleteById(id); //da delete com base no id
+    public void Remover(Integer id){
+        if(!veiculoRepository.existsById(id)) throw new RecursoNaoEncontrado("Veiculo não encontrado");
+        veiculoRepository.deleteById(id);
     }
 
     public List<VeiculoRetornoDTO> Listar(){

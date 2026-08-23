@@ -14,12 +14,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/clientes")
+@RequestMapping("/Clientes")
 public class ClienteController {
     @Autowired
     private ClienteService clienteService;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> cadastrarCliente(
             @RequestBody ClienteCadastroDTO dto) {
 
@@ -35,7 +35,7 @@ public class ClienteController {
                 );
     }
 
-    @PutMapping
+    @PutMapping("/Atualizar")
     public ResponseEntity<ApiResponce<Void>> atualizarCliente(
             @RequestBody ClienteEdicaoDTO dto){
 
@@ -50,7 +50,7 @@ public class ClienteController {
                 ));
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<ClienteRetornoDTO>>> listarCliente(){
         List<ClienteRetornoDTO> clientes = clienteService.Listar();
 

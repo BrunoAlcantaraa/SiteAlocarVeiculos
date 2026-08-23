@@ -10,5 +10,5 @@ import java.math.BigDecimal;
 public class CobrancaPlusCadastro {
     private String descricao;
     private BigDecimal valor;
-    private Long idLocacao;
+    private Integer idLocacao;
 }

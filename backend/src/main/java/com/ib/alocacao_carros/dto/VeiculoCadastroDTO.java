@@ -6,7 +6,7 @@ import lombok.Setter;
 @Setter
 @Getter
 public class VeiculoCadastroDTO {
-    private Long idFunc;
+    private Integer idFunc;
     private String marca;
     private String modelo;
     private Integer anoFabricacao;

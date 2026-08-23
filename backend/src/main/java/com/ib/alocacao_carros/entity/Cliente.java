@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "pessoa")
+@Table(name = "cliente")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -17,9 +17,9 @@ public class Cliente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cliente")
-    private Long idCliente;
+    private Integer idCliente;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "id_pes_cliente")
     private Pessoa pessoa;
 }

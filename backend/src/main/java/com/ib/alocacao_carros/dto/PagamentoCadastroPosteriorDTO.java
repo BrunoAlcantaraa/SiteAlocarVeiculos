@@ -9,6 +9,6 @@ import java.time.LocalDate;
 @Getter
 public class PagamentoCadastroPosteriorDTO {
     private String formaPagamento;
-    private Long idLocacao;
+    private Integer idLocacao;
     private LocalDate dataPagamento;
 }

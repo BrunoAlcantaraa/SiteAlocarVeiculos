@@ -8,8 +8,8 @@ import java.math.BigDecimal;
 @Setter
 @Getter
 public class FuncionarioEdicaoDTO {
-    private Long idFuncLogado;
-    private Long idFunc;
+    private Integer idFuncLogado;
+    private Integer idFunc;
     private BigDecimal salario;
     private String cargo;
     private String username;

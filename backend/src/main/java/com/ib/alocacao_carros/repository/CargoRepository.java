@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CargoRepository extends JpaRepository<Cargo, Long> {
+public interface CargoRepository extends JpaRepository<Cargo, Integer> {
 
-    Cargo findByNome(String nome);
+    Cargo findByNomeCargo(String nome);
 }

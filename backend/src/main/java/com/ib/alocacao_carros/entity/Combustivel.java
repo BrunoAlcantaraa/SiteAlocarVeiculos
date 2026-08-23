@@ -17,7 +17,7 @@ public class Combustivel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_combustivel")
-    private Long idCombustivel;
+    private Integer idCombustivel;
 
     @Column(name = "nome_combustivel")
     private String nomeCombustivel;

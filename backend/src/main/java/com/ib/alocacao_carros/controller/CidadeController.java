@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cidades")
+@RequestMapping("/Cidades")
 public class CidadeController {
     @Autowired
     private CidadeService cidadeService;
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<CidadeDTO>>> listarCidades(){
         List<CidadeDTO> cidades = cidadeService.Listar();
 

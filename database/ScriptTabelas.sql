@@ -35,7 +35,7 @@ create table pessoa( --feito
 	nome_pes varchar(200),
 	CPF varchar(12) unique,
 	data_nascimento date,
-	sexo bit,
+	sexo boolean,
 	email varchar(100),
 	id_endr_pes int,
 	
@@ -56,7 +56,7 @@ create table cliente( --feito
 
 create table telefone( --feito
 	id_tel serial primary key,
-	numero_tel varchar(10),
+	numero_tel varchar(12),
 	id_pes_tel int,
 	
 	constraint fk_pessoa_tel

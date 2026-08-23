@@ -6,8 +6,8 @@ import lombok.Setter;
 @Getter
 @Setter
 public class VeiculoEdicaoDTO {
-    private Long idFunc;
-    private Long idVeiculo;
+    private Integer idFunc;
+    private Integer idVeiculo;
     private String placa;
     private String cor;
     private String urlImagem;

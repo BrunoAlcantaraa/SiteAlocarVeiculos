@@ -18,7 +18,7 @@ public class Cargo {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cargo")
-    private Long idCargo;
+    private Integer idCargo;
 
     @Column(name = "nome_cargo")
     private String nomeCargo;

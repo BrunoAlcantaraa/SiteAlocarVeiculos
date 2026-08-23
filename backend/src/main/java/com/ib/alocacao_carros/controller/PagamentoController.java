@@ -19,7 +19,7 @@ public class PagamentoController {
     @Autowired
     private PagamentoService pagamentoService;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> CadastrarPagamento(
             @RequestBody PagamentoCadastroDTO dto){
 
@@ -35,7 +35,7 @@ public class PagamentoController {
         );
     }
 
-    @PostMapping
+    @PostMapping("/Cadastrar/Posterior")
     public ResponseEntity<ApiResponce<Void>> CadastrarPagamentoPosterior(
             @RequestBody PagamentoCadastroPosteriorDTO dto){
 
@@ -51,7 +51,7 @@ public class PagamentoController {
         );
     }
 
-    @PutMapping
+    @PutMapping("/AdicionarValor")
     public ResponseEntity<ApiResponce<Void>> AdicionarValor(
             @RequestBody AdicionarValorDTO dto){
 
@@ -67,7 +67,7 @@ public class PagamentoController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<PagamentoRetornoDTO>>> ListarPagamentos(){
         List<PagamentoRetornoDTO> pagamentos = pagamentoService.Listar();
 

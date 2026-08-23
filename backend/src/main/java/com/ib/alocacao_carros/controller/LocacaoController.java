@@ -19,7 +19,7 @@ public class LocacaoController {
     @Autowired
     private LocacaoService locacaoService;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> CadastrarLocacao(
             @RequestBody LocacaoCadastroDTO dto){
 
@@ -35,7 +35,7 @@ public class LocacaoController {
         );
     }
 
-    @PutMapping
+    @PutMapping("/ConcluirLocacao")
     public ResponseEntity<ApiResponce<Void>> ConcluirLocacao(
             @RequestBody LocacaoConclusaoDTO dto){
 
@@ -51,7 +51,7 @@ public class LocacaoController {
         );
     }
 
-    @PutMapping
+    @PutMapping("/Alterar")
     public ResponseEntity<ApiResponce<Void>> AlterarLocacao(
             @RequestBody LocacaoEdicaoDTO dto){
 
@@ -67,9 +67,9 @@ public class LocacaoController {
         );
     }
 
-    @DeleteMapping
+    @DeleteMapping("/Excluir")
     public ResponseEntity<ApiResponce<Void>> ExcluirLocacao(
-            @RequestBody Long id){
+            @RequestBody Integer id){
 
         locacaoService.Cancelar(id);
 
@@ -83,7 +83,7 @@ public class LocacaoController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<LocacaoRetornoDTO>>> ListarLocacoes(){
         List<LocacaoRetornoDTO> locacoes = locacaoService.Listar();
 

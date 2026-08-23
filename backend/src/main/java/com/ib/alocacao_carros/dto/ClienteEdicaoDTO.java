@@ -6,7 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ClienteEdicaoDTO {
-    Long id;
+    Integer id;
     PessoaEdicaoDTO pessoa;
     EnderecoCadastroDTO endereco;
     TelefoneEdicaoDTO telefone;

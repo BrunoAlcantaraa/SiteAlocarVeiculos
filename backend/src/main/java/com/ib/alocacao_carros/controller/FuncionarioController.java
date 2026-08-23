@@ -20,7 +20,7 @@ public class FuncionarioController {
     @Autowired
     private FuncionarioService funcionarioService;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> CadastrarFuncionario(
             @RequestBody FuncionarioCadastroDTO dto){
 
@@ -35,7 +35,7 @@ public class FuncionarioController {
         ));
     }
 
-    @PutMapping
+    @PutMapping("/Atualizar")
     public ResponseEntity<ApiResponce<Void>> AtualizarFuncionario(
             @RequestBody FuncionarioEdicaoDTO dto){
 
@@ -50,11 +50,11 @@ public class FuncionarioController {
                 ));
     }
 
-    @GetMapping
-    public ResponseEntity<ApiResponce<Long>> RealizarLogin(
+    @GetMapping("/Login")
+    public ResponseEntity<ApiResponce<Integer>> RealizarLogin(
             @RequestBody LoginDTO dto){
 
-        Long id = funcionarioService.verificaSenha(dto);
+        Integer id = funcionarioService.verificaSenha(dto);
 
         return  ResponseEntity.ok(
                 new ApiResponce<>(
@@ -66,7 +66,7 @@ public class FuncionarioController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<FuncionarioRetornoDTO>>> listarFuncionario(){
         List<FuncionarioRetornoDTO> funcionarios = funcionarioService.Listar();
 

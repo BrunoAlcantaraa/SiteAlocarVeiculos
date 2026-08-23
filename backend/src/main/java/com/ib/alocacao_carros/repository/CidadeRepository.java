@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CidadeRepository extends JpaRepository<Cidade, Long> {
+public interface CidadeRepository extends JpaRepository<Cidade, Integer> {
 
-    Cidade findByNome(String nome);
-    Cidade findByNomeAndEstate(String nome, Estado estado); //evita que a cidade com msm nome mas estado diferente seja mal selecionada
+    Cidade findByNomeCidade(String nome);
+    Cidade findByNomeCidadeAndEstado(String nome, Estado estado); //evita que a cidade com msm nome mas estado diferente seja mal selecionada
 }

@@ -3,15 +3,12 @@ package com.ib.alocacao_carros.service;
 import com.ib.alocacao_carros.dto.*;
 import com.ib.alocacao_carros.entity.*;
 import com.ib.alocacao_carros.repository.*;
-import com.ib.alocacao_carros.dto.*;
-import com.ib.alocacao_carros.entity.*;
 import com.ib.alocacao_carros.exception.AcaoInvalida;
 import com.ib.alocacao_carros.exception.AutorizacaoNegada;
 import com.ib.alocacao_carros.exception.DadosInvalidos;
 import com.ib.alocacao_carros.exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ib.alocacao_carros.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -55,10 +52,10 @@ public class LocacaoService {
 
     public void Cadastro(LocacaoCadastroDTO dto) {
         Locacao locacao = new Locacao();
-        Cliente cliente = clienteRepository.findByPessoaCPF(dto.getCpfCliente());
-        Funcionario func = funcionarioRepository.findByPessoaCPF(dto.getCpfFuncionario());
+        Cliente cliente = clienteRepository.findByPessoa_CPF(dto.getCpfCliente());
+        Funcionario func = funcionarioRepository.findByPessoa_CPF(dto.getCpfFuncionario());
         Veiculo veiculo = veiculoRepository.findByPlaca(dto.getPlacaVeiculo());
-        StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Em Aberto");
+        StatusLocacao statusLocacao = statusLocacaoRepository.findByNomeStatusLocacao("Em Aberto");
 
         if (veiculo == null){
             throw new RecursoNaoEncontrado("Veiculo não encontrado, verifique a placa digitada e tente novamente");
@@ -78,7 +75,7 @@ public class LocacaoService {
         locacao.setStatusLocacao(statusLocacao);
         locacaoRepository.save(locacao); //da insert
 
-        StatusVeiculo statusVeiculo = statusVeiculoRepository.findByNome("Alugado");
+        StatusVeiculo statusVeiculo = statusVeiculoRepository.findByNomeStatusVeiculo("Alugado");
         veiculo.setStatusVeiculo(statusVeiculo); //atualiza o status do veiculo
         veiculoRepository.save(veiculo); //da update no veiculo
     }
@@ -93,7 +90,7 @@ public class LocacaoService {
                 throw new DadosInvalidos("Data de retorno inválida,  verifique os dados informados e tente novamente");
             }
 
-            StatusLocacao statusLocacao = statusLocacaoRepository.findByNome("Finalizada");
+            StatusLocacao statusLocacao = statusLocacaoRepository.findByNomeStatusLocacao("Finalizada");
 
             locacao.get().setKmsRetorno(dto.getKms());
             locacao.get().setDataRetornoReal(dto.getDataRetorno());
@@ -101,7 +98,7 @@ public class LocacaoService {
             locacaoRepository.save(locacao.get()); //da update
 
             Veiculo veiculo = locacao.get().getVeiculo();
-            StatusVeiculo status = statusVeiculoRepository.findByNome("Disponível");
+            StatusVeiculo status = statusVeiculoRepository.findByNomeStatusVeiculo("Disponível");
             veiculo.setStatusVeiculo(status); //atualiza o status do veiculo
             veiculo.setKmsAtual(dto.getKms()); //atualiza a kilometragem do carro
             veiculoRepository.save(veiculo); //da update
@@ -124,7 +121,7 @@ public class LocacaoService {
             Veiculo veiculo = veiculoRepository.findByPlaca(dto.getPlacaVeiculo());
             if (!veiculo.getPlaca().equals(locacao.get().getVeiculo().getPlaca())) { //caso seja um carro diferente, vaia tualizar os status de cada
                 veiculoAntigo = locacao.get().getVeiculo();
-                veiculoAntigo.setStatusVeiculo(statusVeiculoRepository.findByNome("Disponível")); //atualiza o status
+                veiculoAntigo.setStatusVeiculo(statusVeiculoRepository.findByNomeStatusVeiculo("Disponível")); //atualiza o status
                 veiculoRepository.save(veiculoAntigo); //da update
             }
 
@@ -135,19 +132,19 @@ public class LocacaoService {
             locacao.get().setVeiculo(veiculo);
             locacaoRepository.save(locacao.get()); //da update
 
-            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNome("Alugado"));
+            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNomeStatusVeiculo("Alugado"));
             veiculoRepository.save(veiculo); //da update
         }else{
             throw new RecursoNaoEncontrado("Locacao não encontrada, verifica o id ai brunin");
         }
     }
 
-    public void Cancelar(Long id){
+    public void Cancelar(Integer id){
         Optional<Locacao> locacao = locacaoRepository.findById(id);
 
         if(locacao.isPresent()){
             Veiculo veiculo = locacao.get().getVeiculo();
-            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNome("Disponível")); //atualiza o status do carro
+            veiculo.setStatusVeiculo(statusVeiculoRepository.findByNomeStatusVeiculo("Disponível")); //atualiza o status do carro
             veiculoRepository.save(veiculo); //da update
             locacaoRepository.deleteById(id); //da delete
         }else{

@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CombustivelRepository extends JpaRepository<Combustivel, Long> {
+public interface CombustivelRepository extends JpaRepository<Combustivel, Integer> {
 
-    Combustivel findByNome(String nome);
+    Combustivel findByNomeCombustivel(String nome);
 }

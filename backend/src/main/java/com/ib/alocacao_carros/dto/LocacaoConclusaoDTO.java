@@ -8,7 +8,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 public class LocacaoConclusaoDTO {
-    private Long id;
+    private Integer id;
     private LocalDate DataRetorno;
     private Float kms;
 }

@@ -5,12 +5,9 @@ import com.ib.alocacao_carros.entity.Cargo;
 import com.ib.alocacao_carros.entity.Funcionario;
 import com.ib.alocacao_carros.entity.Pessoa;
 import com.ib.alocacao_carros.repository.*;
-import com.ib.alocacao_carros.dto.*;
-import com.ib.alocacao_carros.entity.*;
 import com.ib.alocacao_carros.exception.AutorizacaoNegada;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ib.alocacao_carros.repository.*;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
@@ -30,7 +27,7 @@ public class FuncionarioService {
     private PessoaService pessoaService;
     private EnderecoService enderecoService;
 
-    public boolean VerificarPermissao(Long id){
+    public boolean VerificarPermissao(Integer id){
         Optional<Funcionario> funcionarioLogado = funcionarioRepository.findById(id);
 
         if(funcionarioLogado.isPresent()) {
@@ -55,7 +52,7 @@ public class FuncionarioService {
         return dto;
     }
 
-    public Long verificaSenha(LoginDTO dto) {
+    public Integer verificaSenha(LoginDTO dto) {
         Funcionario funcionario = funcionarioRepository.findByUsername(dto.getUsername());
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -77,7 +74,7 @@ public class FuncionarioService {
 
         Pessoa pessoa = new Pessoa();
 
-        if (clienteRepository.findByPessoaCPF(pesDto.getCpf()) != null) {
+        if (clienteRepository.findByPessoa_CPF(pesDto.getCpf()) != null) {
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf()); //impede que o código tente duplicar a pessoa
         } else { //caso não seja um cliente
             pessoaService.VerificarDados(pesDto.getCpf(),pesDto.getEmail(),pesDto.getDataNascimento());
@@ -85,7 +82,7 @@ public class FuncionarioService {
             pessoa = pessoaService.Cadastro(pesDto, enderecoDto);
         }
 
-            Cargo cargo = cargoRepository.findByNome(dto.getCargo()); //pesquisa o cargo
+            Cargo cargo = cargoRepository.findByNomeCargo(dto.getCargo()); //pesquisa o cargo
             Funcionario funcionario = new Funcionario();
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String senhaCript = encoder.encode(dto.getSenha()); //criptografa a senha
@@ -112,7 +109,7 @@ public class FuncionarioService {
 
             BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
             String senhaHash = encoder.encode(funcDto.getSenha());
-            Cargo cargo = cargoRepository.findByNome(funcDto.getCargo());
+            Cargo cargo = cargoRepository.findByNomeCargo(funcDto.getCargo());
             func.get().setSalario(funcDto.getSalario());
             func.get().setUsername(funcDto.getUsername());
             func.get().setSenhaHash(senhaHash);

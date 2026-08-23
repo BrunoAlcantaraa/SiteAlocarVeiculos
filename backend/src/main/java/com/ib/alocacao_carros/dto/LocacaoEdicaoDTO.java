@@ -8,8 +8,8 @@ import java.time.LocalDate;
 @Setter
 @Getter
 public class LocacaoEdicaoDTO {
-    private Long id;
-    private Long idFunc;
+    private Integer id;
+    private Integer idFunc;
     private LocalDate dataSaida;
     private LocalDate dataRetornoPrevista;
     private Float kms;

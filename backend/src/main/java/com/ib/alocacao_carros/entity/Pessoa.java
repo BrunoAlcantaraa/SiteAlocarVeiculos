@@ -19,7 +19,7 @@ public class Pessoa {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_pes")
-    private Long idPessoa;
+    private Integer idPessoa;
 
     @Column(name = "nome_pes")
     private String nomePessoa;
@@ -36,4 +36,7 @@ public class Pessoa {
     @ManyToOne
     @JoinColumn(name = "id_endr_pes")
     private Endereco endereco;
+
+    @OneToOne(mappedBy = "pessoa")
+    private Cliente cliente;
 }

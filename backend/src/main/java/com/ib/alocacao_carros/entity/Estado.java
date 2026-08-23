@@ -17,7 +17,7 @@ public class Estado {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_estd")
-    private Long idEstado;
+    private Integer idEstado;
 
     @Column(name = "nome_estd") //como eu vou colocar um nome diferente na variavel, tem que referenciar a coluna
     private String nomeEstado;

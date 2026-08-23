@@ -33,8 +33,8 @@ public class EnderecoService {
 
     public Endereco cadastrar(EnderecoCadastroDTO dto){
         Endereco endereco = new Endereco();
-        Estado estado = estadoRepository.findByNome(dto.getEstado()); //pesquisa um estado para evitar pegar a cidade errada
-        Cidade cidade = cidadeRepository.findByNomeAndEstate(dto.getCidade(),estado); //pesquisa a cidade para definir a FK
+        Estado estado = estadoRepository.findByNomeEstado(dto.getEstado()); //pesquisa um estado para evitar pegar a cidade errada
+        Cidade cidade = cidadeRepository.findByNomeCidadeAndEstado(dto.getCidade(),estado); //pesquisa a cidade para definir a FK
 
         //definição dos atributos
         endereco.setRua(dto.getRua());
@@ -49,8 +49,8 @@ public class EnderecoService {
     }
 
     public Endereco Editar(Endereco endereco, EnderecoCadastroDTO dto) {
-        Estado estado = estadoRepository.findByNome(dto.getEstado());
-        Cidade cid = cidadeRepository.findByNomeAndEstate(dto.getCidade(),estado);
+        Estado estado = estadoRepository.findByNomeEstado(dto.getEstado());
+        Cidade cid = cidadeRepository.findByNomeCidadeAndEstado(dto.getCidade(),estado);
 
         //definição dos atributos
         endereco.setRua(dto.getRua());

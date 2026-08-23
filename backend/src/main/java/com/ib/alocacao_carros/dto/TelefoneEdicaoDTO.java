@@ -7,5 +7,5 @@ import lombok.Setter;
 @Setter
 public class TelefoneEdicaoDTO {
     private String numero;
-    private Long id;
+    private Integer id;
 }

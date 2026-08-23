@@ -1,7 +1,6 @@
 package com.ib.alocacao_carros.service;
 
 import com.ib.alocacao_carros.dto.*;
-import com.ib.alocacao_carros.dto.*;
 import com.ib.alocacao_carros.entity.CobrancaAdicional;
 import com.ib.alocacao_carros.entity.Locacao;
 import com.ib.alocacao_carros.entity.Pagamento;
@@ -43,7 +42,7 @@ public class PagamentoService {
         return dto;
     }
 
-    public BigDecimal CalcularValorFinal(Long idLocacao){
+    public BigDecimal CalcularValorFinal(Integer idLocacao){
         Optional<Locacao> locacao = locacaoRepository.findById(idLocacao);
 
         if(locacao.isPresent()){
@@ -80,7 +79,7 @@ public class PagamentoService {
         if(ValorFinal == null) throw new RecursoNaoEncontrado("Locacao não encontrada");
 
         Optional<Locacao> locacao = locacaoRepository.findById(dto.getIdLocacao());
-        StatusPagamento statusPagamento = statusPagamentoRepository.findByNome("Em aberto");
+        StatusPagamento statusPagamento = statusPagamentoRepository.findByNomeStatusPagamento("Em aberto");
 
         pagamento.setFormaPagamento(dto.getFormaPagamento());
         pagamento.setValorPagamento(ValorFinal);
@@ -97,7 +96,7 @@ public class PagamentoService {
         if(ValorFinal == null) throw new RecursoNaoEncontrado("Locacao não encontrada");
 
         Optional<Locacao> locacao = locacaoRepository.findById(dto.getIdLocacao());
-        StatusPagamento statusPagamento = statusPagamentoRepository.findByNome("Pago");
+        StatusPagamento statusPagamento = statusPagamentoRepository.findByNomeStatusPagamento("Pago");
 
         pagamento.setFormaPagamento(dto.getFormaPagamento());
         pagamento.setValorPagamento(ValorFinal);

@@ -17,7 +17,7 @@ public class StatusPagamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_status_pagamento")
-    private Long idStatusPagamento;
+    private Integer idStatusPagamento;
 
     @Column(name = "nome_status_pagamento")
     private String nomeStatusPagamento;

@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MarcaRepository extends JpaRepository<Marca, Long> {
-    Marca findByNome(String nome);
+public interface MarcaRepository extends JpaRepository<Marca, Integer> {
+    Marca findByNomeMarca(String nome);
 }

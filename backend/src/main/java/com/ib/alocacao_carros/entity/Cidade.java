@@ -17,7 +17,7 @@ public class Cidade {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cid")
-    private Long idCidade;
+    private Integer idCidade;
 
     @Column(name = "nome_cid")
     private String nomeCidade;

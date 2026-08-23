@@ -47,7 +47,8 @@ public class CobrancaPlusService {
         }
     }
 
-    public void Remover(Long id){
+    public void Remover(Integer id){
+        if(!cobrancaAdicionalRepository.existsById(id)) throw new RecursoNaoEncontrado("Cobranca não encontrada");
         cobrancaAdicionalRepository.deleteById(id);
     }
 

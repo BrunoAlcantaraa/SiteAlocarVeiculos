@@ -19,7 +19,7 @@ public class Funcionario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_func")
-    private Long idFuncionario;
+    private Integer idFuncionario;
 
     private BigDecimal salario;
 

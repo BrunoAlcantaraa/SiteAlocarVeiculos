@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StatusVeiculoRepository extends JpaRepository<StatusVeiculo,Long> {
-    StatusVeiculo findByNome(String nome);
+public interface StatusVeiculoRepository extends JpaRepository<StatusVeiculo,Integer> {
+    StatusVeiculo findByNomeStatusVeiculo(String nome);
 }

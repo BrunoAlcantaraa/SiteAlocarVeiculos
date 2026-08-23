@@ -7,6 +7,6 @@ import lombok.Setter;
 @Getter
 
 public class AdicionarValorDTO {
-    private Long id;
+    private Integer id;
     CobrancaPlusCadastro CPC;
 }

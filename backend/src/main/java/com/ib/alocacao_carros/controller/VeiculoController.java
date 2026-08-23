@@ -18,7 +18,7 @@ public class VeiculoController {
     @Autowired
     private VeiculoService veiculoService;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> CadastrarVeiculo(
             @RequestBody VeiculoCadastroDTO dto){
 
@@ -34,7 +34,7 @@ public class VeiculoController {
         );
     }
 
-    @PutMapping
+    @PutMapping("/Atualizar")
     public ResponseEntity<ApiResponce<Void>> AtualizarVeiculo(
             @RequestBody VeiculoEdicaoDTO dto){
 
@@ -49,9 +49,9 @@ public class VeiculoController {
                 ));
     }
 
-    @DeleteMapping
+    @DeleteMapping("/Excluir")
     public ResponseEntity<ApiResponce<Void>> ExcluirVeiculo(
-            @RequestBody Long id){
+            @RequestBody Integer id){
 
         veiculoService.Remover(id);
 
@@ -64,7 +64,7 @@ public class VeiculoController {
                 ));
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<VeiculoRetornoDTO>>> ListarVeiculos(){
         List<VeiculoRetornoDTO> veiculos = veiculoService.Listar();
 

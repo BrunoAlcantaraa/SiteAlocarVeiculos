@@ -17,7 +17,7 @@ public class CobrancaPlusController {
     @Autowired
     private CobrancaPlusService service;
 
-    @PostMapping
+    @PostMapping("/Cadastrar")
     public ResponseEntity<ApiResponce<Void>> CadastrarCobranca(
             CobrancaPlusCadastro dto){
 
@@ -33,9 +33,9 @@ public class CobrancaPlusController {
         );
     }
 
-    @DeleteMapping
+    @DeleteMapping("/Excluir")
     public ResponseEntity<ApiResponce<Void>> ExcluirCobranca(
-            @RequestParam Long id){
+            @RequestParam Integer id){
 
         service.Remover(id);
 
@@ -49,7 +49,7 @@ public class CobrancaPlusController {
         );
     }
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<CobrancaPlusRetornoDTO>>> ListarCobrancas(){
         List<CobrancaPlusRetornoDTO> list = service.Listar();
 

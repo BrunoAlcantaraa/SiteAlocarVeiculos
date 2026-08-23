@@ -19,7 +19,7 @@ public class CobrancaAdicional {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_cobranca")
-    private Long idCobranca;
+    private Integer idCobranca;
 
     @Column(name = "descricao_cobranca")
     private String descricaoCobranca;

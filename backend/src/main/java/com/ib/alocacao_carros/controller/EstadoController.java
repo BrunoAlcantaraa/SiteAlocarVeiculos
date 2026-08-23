@@ -18,7 +18,7 @@ public class EstadoController {
     @Autowired
     private EstadoService estadoService;
 
-    @GetMapping
+    @GetMapping("/Listar")
     public ResponseEntity<ApiResponce<List<EstadoDTO>>> listarEstados(){
         List<EstadoDTO> estados = estadoService.Listar();
 

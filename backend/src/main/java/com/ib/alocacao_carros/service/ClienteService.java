@@ -2,13 +2,11 @@ package com.ib.alocacao_carros.service;
 
 import com.ib.alocacao_carros.dto.*;
 import com.ib.alocacao_carros.repository.*;
-import com.ib.alocacao_carros.dto.*;
 import com.ib.alocacao_carros.entity.Cliente;
 import com.ib.alocacao_carros.entity.Pessoa;
 import com.ib.alocacao_carros.exception.RecursoNaoEncontrado;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ib.alocacao_carros.repository.*;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,8 +21,8 @@ public class ClienteService {
     private final PessoaRepository pessoaRepository;
     private final FuncionarioRepository funcionarioRepository;
     private final EnderecoRepository enderecoRepository;
-    private PessoaService pessoaService;
-    private EnderecoService enderecoService;
+    private final PessoaService pessoaService;
+    private final EnderecoService enderecoService;
 
     public ClienteRetornoDTO ConverterParaDTO(Cliente cliente){
         ClienteRetornoDTO dto = new ClienteRetornoDTO();
@@ -44,7 +42,7 @@ public class ClienteService {
         PessoaCadastroDTO pesDto = dto.getPessoa();
         EnderecoCadastroDTO enderecoDto = dto.getEndereco();
 
-        if(funcionarioRepository.findByPessoaCPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
+        if(funcionarioRepository.findByPessoa_CPF(pesDto.getCpf()) != null){ //caso algum funcionario queira ser cliente, não duplica a pessoa
             pessoa = pessoaRepository.findByCPF(pesDto.getCpf());
         }else { //caso não seja um funcionário, segue o fluxo normal
             pessoaService.VerificarDados(pesDto.getCpf(),pesDto.getEmail(),pesDto.getDataNascimento());
